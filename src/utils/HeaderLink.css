@@ -1,0 +1,38 @@
+.header-link {
+  box-sizing: border-box;
+  padding: 10px;
+  background-color: var(--light-color);
+  text-decoration: none;
+  overflow: hidden;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  transition: 600ms ease;
+}
+
+.header-link:hover {
+  padding: 12px;
+  font-size: 1.3rem;
+}
+
+.header-link > a {
+  text-decoration: none;
+  color: var(--dark-color);
+}
+
+.header-link::before {
+  content: '';
+  position: relative;
+  display: block;
+  bottom: 0;
+  left: 0;
+  width: inherit;
+  height: 5px;
+  background-color: var(--dark-color);
+  transition: 600ms ease;
+  transform: translateY(60px);
+  border-radius: 5px;
+}
+
+.header-link:hover::before {
+  transform: translateY(35px);
+}
