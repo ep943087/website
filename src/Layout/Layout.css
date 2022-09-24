@@ -9,6 +9,7 @@
   --container-padding: 10px;
   --dark-color: #363636;
   --light-color: #dedede;
+  --opacity: .94;
 }
 
 .body {
@@ -23,25 +24,33 @@
 }
 
 .topNavigation {
+  z-index: 1;
   background-color: var(--dark-color);
   height: 75px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: var(--container-padding)
+  padding: var(--container-padding);
+  opacity: var(--opacity);
 }
 
 .main {
   background-color: var(--light-color);
   min-height: calc(100vh - 75px - 75px);
   padding: var(--container-padding);
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .footer {
+  z-index: 1;
   background-color: var(--dark-color);
   height: 75px;
   display: flex;
   justify-content: center;
   align-items: center;
+  opacity: var(--opacity);
 }

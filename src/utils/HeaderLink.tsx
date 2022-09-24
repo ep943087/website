@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import styled from 'styled-components';
 import './HeaderLink.css';
 
 const HeaderLink = (props: HeaderLinkProps) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import projects from '../config/projects';
 import styled from 'styled-components';
 
@@ -7,14 +6,15 @@ const ProjectsContainer = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
   a {
     text-decoration: none;
     font-size: 1.1rem;
   }
-
   a:hover {
     font-size: 1.3rem;
   }
+  opacity: var(--opacity);
 `;
 
 const ProjectContainer = styled.div`
@@ -37,7 +37,7 @@ const ProjectContainer = styled.div`
 
 const LandingPage = () => {
   return (
-    <div>
+    <>
       <ProjectsContainer>
         {projects.map((project, index) =>
           <a key={index} href={project.linkURL} target="_blank" rel="noreferrer">
@@ -47,7 +47,7 @@ const LandingPage = () => {
           </a>
         )}
       </ProjectsContainer>
-    </div>
+    </>
   );
 }
 
