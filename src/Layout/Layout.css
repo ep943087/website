@@ -10,6 +10,11 @@
   --dark-color: #363636;
   --light-color: #dedede;
   --opacity: .94;
+  --topNavHeight: 75px;
+}
+
+.hide {
+  display: none;
 }
 
 .body {
@@ -26,16 +31,62 @@
 .topNavigation {
   z-index: 1;
   background-color: var(--dark-color);
-  height: 75px;
+  height: var(--topNavHeight);
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   padding: var(--container-padding);
   opacity: var(--opacity);
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.topNavigationSidebar {
+  z-index: 300;
+  position: fixed;
+  top: var(--topNavHeight);
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - var(--topNavHeight));
+  transform: translateX(100vw);
+  background-color: var(--dark-color);
+  transition: 250ms ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px;
+  overflow-y: hidden;
+}
+
+.topNavigationSidebar a {
+  width: 90%;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  transition: .5s ease;
+  font-size: 1.1rem;
+  border-radius: 5px;
+}
+
+.topNavigationSidebar a:hover {
+  color: var(--dark-color);
+  background-color: var(--light-color);
+  font-size: 1.3rem;
+  padding: 15px;
+  width: 92%;
+}
+
+.topNavigationSidebar__show {
+  transform: translateX(0);
 }
 
 .main {
+  margin-top: var(--topNavHeight);
   background-color: var(--light-color);
   min-height: calc(100vh - 75px - 75px);
   padding: var(--container-padding);
@@ -48,9 +99,15 @@
 .footer {
   z-index: 1;
   background-color: var(--dark-color);
-  height: 75px;
+  height: var(--topNavHeight);
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: var(--opacity);
+}
+
+@media (min-width: 655px) {
+  .topNavigationSidebar {
+    display: none;
+  }
 }
