@@ -28,6 +28,10 @@ const ProjectContainer = styled.div`
   background-color: var(--dark-color);
   border-radius: 5px;
   transition: 600ms ease;
+  -webkit-transition: 600ms ease;
+  -moz-transition: 600ms ease;
+  -ms-transition: 600ms ease;
+  -o-transition: 600ms ease;
   padding: 10px;
   &:hover {
     width: 310px; 

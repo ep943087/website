@@ -19,9 +19,9 @@ const projects: Project[] = [
   },
   {
     imageURL: '',
-    linkURL: 'https://ep943087.github.io/gravity_2d_simulation/',
+    linkURL: 'https://ep-snakegame.herokuapp.com/',
     externalLink: true,
-    caption: 'Gravity Simulation',
+    caption: 'Multiplayer Snake Game',
   },
 ];
 

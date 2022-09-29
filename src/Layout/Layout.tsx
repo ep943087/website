@@ -3,6 +3,7 @@ import BackgroundCanvas from "./BackgroundCanvas";
 import Footer from "./Footer";
 import TopNavigation, { TopNavigationLink } from "./TopNavigation";
 import TopNavigationSidebar from "./TopNavigationSidebar";
+import './Layout.css';
 
 const topNavLinks: TopNavigationLink[] = [
   { link: '/about', label: 'About' },

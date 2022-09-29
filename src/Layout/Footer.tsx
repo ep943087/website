@@ -1,7 +1,7 @@
 function Footer() {
   return (
     <div className="footer">
-      &copy;&nbsp;eliasproctor.com
+      &copy; {new Date().getFullYear()} eliasproctor.com
     </div>
   );
 }

@@ -27,18 +27,34 @@
 
 .navLinkButton__bar {
   transition: 250ms ease;
+  -webkit-transition: 250ms ease;
+  -moz-transition: 250ms ease;
+  -ms-transition: 250ms ease;
+  -o-transition: 250ms ease;
 }
 
 .navLinkButton__clicked > .navLinkButton__bar:nth-child(1) {
   transform: translateY(14px) rotateZ(45deg);
+  -webkit-transform: translateY(14px) rotateZ(45deg);
+  -moz-transform: translateY(14px) rotateZ(45deg);
+  -ms-transform: translateY(14px) rotateZ(45deg);
+  -o-transform: translateY(14px) rotateZ(45deg);
 }
 
 .navLinkButton__clicked > .navLinkButton__bar:nth-child(2) {
   transform: translateX(-100px);
+  -webkit-transform: translateX(-100px);
+  -moz-transform: translateX(-100px);
+  -ms-transform: translateX(-100px);
+  -o-transform: translateX(-100px);
 }
 
 .navLinkButton__clicked > .navLinkButton__bar:nth-child(3) {
   transform: translateY(-14px) rotateZ(-45deg);
+  -webkit-transform: translateY(-14px) rotateZ(-45deg);
+  -moz-transform: translateY(-14px) rotateZ(-45deg);
+  -ms-transform: translateY(-14px) rotateZ(-45deg);
+  -o-transform: translateY(-14px) rotateZ(-45deg);
 }
 
 .navLinkButton__bar {

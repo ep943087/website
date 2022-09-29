@@ -4,7 +4,7 @@ class Ball {
   private vel: number = .3;
   private radius: number = 3;
 
-  private static gravitationalConstant = .03;
+  private static gravitationalConstant = .005;
   private static maxVelocity = .6;
 
   constructor(private x: number, private y: number, private canvas: HTMLCanvasElement) {

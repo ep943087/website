@@ -4,7 +4,6 @@ import {
   Routes
 } from 'react-router-dom';
 import routeConfig from './config/route-config';
-import './Layout/Layout.css';
 import Layout from './Layout/Layout';
 
 function App() {
