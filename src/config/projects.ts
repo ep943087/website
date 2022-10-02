@@ -7,12 +7,6 @@ const projects: Project[] = [
   },
   {
     imageURL: '',
-    linkURL: 'https://ep943087.github.io/game-of-life/',
-    externalLink: true,
-    caption: 'Game of Life'
-  },
-  {
-    imageURL: '',
     linkURL: 'https://ep943087.github.io/sorting_simulation/',
     externalLink: true,
     caption: 'Sorting Simulation',

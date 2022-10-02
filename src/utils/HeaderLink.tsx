@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import './HeaderLink.css';
 
 const HeaderLink = (props: HeaderLinkProps) => {
   return (
     <div className="header-link">
-      <Link to={props.linkURL} onClick={props.onClick}>
+      <NavLink to={props.linkURL} onClick={props.onClick} style={({ isActive }) => isActive ? {} : {}}>
         {props.label}
-      </Link>
+      </NavLink>
     </div>
   );
 };

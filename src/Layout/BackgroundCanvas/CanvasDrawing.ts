@@ -9,8 +9,8 @@ class CanvasDrawing {
 
   drawBalls () {
     const balls = this.simulation.getBalls();
-    const drawDistance = 150;
-    this.ctx.lineWidth = 1.5;
+    const drawDistance = 200;
+    this.ctx.lineWidth = 1;
     this.ctx.fillStyle = "var(--dark-color)";
     this.ctx.strokeStyle = "var(--dark-color)";
     for (let i=0;i<balls.length;i++) {

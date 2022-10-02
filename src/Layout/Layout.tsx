@@ -1,18 +1,24 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import BackgroundCanvas from "./BackgroundCanvas";
 import Footer from "./Footer";
 import TopNavigation, { TopNavigationLink } from "./TopNavigation";
 import TopNavigationSidebar from "./TopNavigationSidebar";
 import './Layout.css';
+import GlobalContext from "../context/Global/GlobalContext";
 
 const topNavLinks: TopNavigationLink[] = [
-  { link: '/about', label: 'About' },
+  { link: '/projects', label: 'Projects' },
+  { link: '/skills', label: 'Skills' }
 ];
 
 
 const Layout = (props: LayoutProps) => {
-
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
+  const { transparentMain } = useContext(GlobalContext);
+
+  const mainStyle: React.CSSProperties = {
+    opacity: transparentMain ? '.9' : '1',
+  };
 
   return (
     <div className="body">
@@ -25,10 +31,10 @@ const Layout = (props: LayoutProps) => {
         showSidebar={showSidebar}
         topNavLinks={topNavLinks}
       />
-        <div className="main">
-          <BackgroundCanvas />
-          {props.children}
-        </div>
+      <BackgroundCanvas />
+      <div className="main" style={mainStyle}>
+        {props.children}
+      </div>
       <Footer />
     </div>
   );

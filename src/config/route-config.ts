@@ -1,8 +1,10 @@
-import LandingPage from "../Layout/LandingPage";
-import AboutPage from "../pages/AboutPage";
+import LandingPage from "../pages/LandingPage";
+import ProjectsPage from "../pages/ProjectsPage";
+import SkillsPage from "../pages/SkillsPage";
 
 const routeConfig: Route[] = [
-  { path: '/about', component: AboutPage },
+  { path: '/projects', component: ProjectsPage },
+  { path: '/skills', component: SkillsPage },
   { path: "/", component: LandingPage },
 ];
 
