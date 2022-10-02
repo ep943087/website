@@ -13,64 +13,6 @@ const SkillContainer = styled.div`
   > * {
     margin-bottom: 5px;
   }
-
-  > .svg {
-    animation-name: svg;
-    animation-duration: 4s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-  }
-
-  .star-container > div {
-    animation-name: rotate;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-  }
-
-  > .star-container > div:nth(1) {
-    animation-delay: 100ms;
-  }
-
-  > .star-container > div:nth(2) {
-    animation-delay: 200ms;
-  }
-
-  > .star-container > div:nth(3) {
-    animation-delay: 300ms;
-  }
-
-  > .star-container > div:nth(4) {
-    animation-delay: 400ms;
-  }
-
-  > .star-container > div:nth(5) {
-    animation-delay: 500ms;
-  }
-
-  @keyframes svg {
-    0% {
-      transform: rotateY(0);
-    }
-    25% {
-      transform: rotateY(30deg);
-    }
-    75% {
-      transform: rotateY(-30deg);
-    }
-    100% {
-      transform: rotateY(0);
-    }
-  }
-
-  @keyframes rotate {
-    from {
-      transform: rotateY(0);
-    }
-    to {
-      transform: rotateY(360deg);
-    }
-  }
 `;
 
 const StarsContainer = styled.div`

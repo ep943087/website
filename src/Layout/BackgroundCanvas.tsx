@@ -4,9 +4,9 @@ import CanvasDrawing from './BackgroundCanvas/CanvasDrawing';
 import CanvasSimulation from './BackgroundCanvas/CanvasSimulation';
 
 const CanvasContainer = styled.canvas`
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: -1;
@@ -20,7 +20,7 @@ const BackgroundCanvas = () => {
     const canvas = canvasRef.current as HTMLCanvasElement;
     const canvasSimulation = new CanvasSimulation(canvas);
     const canvasDrawing = new CanvasDrawing(canvas, canvasSimulation);
-    const drawInterval = setInterval(canvasDrawing.draw, 10);
+    const drawInterval = setInterval(canvasDrawing.draw, 30);
     const simulationInterval = setInterval(canvasSimulation.update, 10);
     setTimeout(canvasSimulation.handleWindowResize, 2);
     window.addEventListener('resize', canvasSimulation.handleWindowResize);
