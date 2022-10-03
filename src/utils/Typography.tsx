@@ -33,7 +33,7 @@ const Typography = (props: TypographyProps) => {
 };
 
 interface TypographyProps {
-  children: string,
+  children: React.ReactNode,
   variant: VariantType,
   color?: string,
   isBlock?: boolean,

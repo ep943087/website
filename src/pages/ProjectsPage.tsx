@@ -1,7 +1,9 @@
-import projects from '../config/projects';
+import { ProjectType, simulationProjects, mathProjects, gameProjects } from '../config/projects';
 import styled from 'styled-components';
-import Page from '../Layout/Page';
 import Typography from '../utils/Typography';
+import PageAndSideNav from '../Layout/PageAndSideNav';
+import { createRef } from 'react';
+import { SideBarLinkProps } from '../utils/SideBarLink';
 
 const ProjectsContainer = styled.div`
   display: flex;
@@ -20,7 +22,7 @@ const ProjectsContainer = styled.div`
 
 const ProjectContainer = styled.div`
   width: 300px;
-  height: 400px;
+  height: 300px;
   border: 1px solid black;
   margin: 5px;
   background-repeat: no-repeat;
@@ -37,36 +39,59 @@ const ProjectContainer = styled.div`
   padding: 10px;
   &:hover {
     width: 310px; 
-    height: 410px;
+    height: 310px;
   }
 `;
 
-const ProjectsPageContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: space-around;
-  flex-wrap: wrap;
-`;
+const renderProjectsList = (projects: ProjectType[]) => (
+  <ProjectsContainer>
+    {projects.map((project, index) =>
+      <a key={index} href={project.linkURL} target="_blank" rel="noreferrer">
+        <ProjectContainer style={{ backgroundImage: `url(${project.imageURL})`}}>
+          <Typography variant="subheading" color="var(--dark-color)">{project.caption}</Typography>
+        </ProjectContainer>
+      </a>
+    )}
+  </ProjectsContainer>
+);
 
 const ProjectsPage = () => {
+  const projectsRef = createRef<HTMLDivElement>();
+  const gamesRef = createRef<HTMLDivElement>();
+  const simulationsRef = createRef<HTMLDivElement>();
+  const mathRef = createRef<HTMLDivElement>();
+
+  const sideBarLinks: SideBarLinkProps[] = [
+    { label: 'Projects', reference: projectsRef },
+    { label: 'Simulations', reference: simulationsRef },
+    { label: 'Games', reference: gamesRef },
+    { label: 'Math', reference: mathRef },
+  ];
+
   return (
-    <Page>
+    <PageAndSideNav sidebarLinks={sideBarLinks}>
+      <div ref={projectsRef} className="scrollToDiv" />
       <Typography variant="title" textAlign="center">Projects</Typography>
-      <ProjectsPageContainer>
-        <ProjectsContainer>
-          {projects.map((project, index) =>
-            <a key={index} href={project.linkURL} target="_blank" rel="noreferrer">
-              <ProjectContainer style={{ backgroundImage: `url(${project.imageURL})`}}>
-                <Typography variant="subheading" color="var(--dark-color)">{project.caption}</Typography>
-              </ProjectContainer>
-            </a>
-          )}
-        </ProjectsContainer>
-      </ProjectsPageContainer>
-    </Page>
+      <div style={{ maxWidth: '500px', margin: '0 auto' }}>
+        <Typography variant="body" textAlign="center">
+          Here are a few of my projects that I've implemented over a the past few years. Some of these projects
+          come from my college years, and are hosted on Cameron University's <a href="http://ada.cameron.edu/~ep943087/practice/" rel="noreferrer" target="_blank">ADA Server</a>.
+          Some are on my <a href="https://github.com/ep943087?tab=repositories" rel="noreferrer" target="_blank">Github account</a> and can be accessed through the Github Pages tab of some repositories.
+        </Typography>
+      </div>
+
+      <div ref={simulationsRef} className="scrollToDiv" />
+      <Typography variant="title" textAlign="center">Simulations</Typography>
+      {renderProjectsList(simulationProjects)}
+
+      <div ref={gamesRef} className="scrollToDiv" />
+      <Typography variant="title" textAlign="center">Games</Typography>
+      {renderProjectsList(gameProjects)}
+
+      <div ref={mathRef} className="scrollToDiv" />
+      <Typography variant="title" textAlign="center">Math</Typography>
+      {renderProjectsList(mathProjects)}
+    </PageAndSideNav>
   );
 }
 

@@ -94,3 +94,40 @@
     grid-template-rows: 100%;
   }
 }
+
+
+.swipeRight {
+  animation-name: swipeRight;
+  animation-duration: 500ms;
+}
+
+.swipeLeft {
+  animation-name: swipeLeft;
+  animation-duration: 500ms;
+}
+
+.page > * {
+  margin-top: var(--container-padding);
+}
+
+@keyframes swipeRight {
+  0% {
+    transform: translateX(100px);
+    opacity: .5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes swipeLeft {
+  0% {
+    transform: translateX(-100px);
+    opacity: .5;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

@@ -1,7 +1,12 @@
+import { useEffect } from 'react';
 import SideBarLink, { SideBarLinkProps } from '../utils/SideBarLink';
 import './PageAndSideNav.css';
 
 const PageAndSideNav = (props: PageAndSideNavProps) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+  
   return (
     <div className="pageAndSideNav">
       <div className="pageAndSideNav__sidebar swipeLeft">
