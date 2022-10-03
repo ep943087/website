@@ -8,7 +8,6 @@ import GlobalContext from "../context/Global/GlobalContext";
 
 const topNavLinks: TopNavigationLink[] = [
   { link: '/projects', label: 'Projects' },
-  { link: '/skills', label: 'Skills' }
 ];
 
 

@@ -1,3 +1,5 @@
+import React from "react";
+
 type VariantType = 'title' | 'subheading' | 'body';
 
 interface StyleMap { fontSize: string, isBlock: boolean, isBold: boolean }
@@ -33,14 +35,11 @@ const Typography = (props: TypographyProps) => {
 interface TypographyProps {
   children: string,
   variant: VariantType,
-  color: string,
+  color?: string,
   isBlock?: boolean,
   isBold?: boolean,
   textAlign?: 'center' | 'left' | 'right',
-}
-
-Typography.defaultProps = {
-  color: 'var(--light-color)',
+  ref?:  React.LegacyRef<HTMLSpanElement>,
 }
 
 export default Typography;

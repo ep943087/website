@@ -1,0 +1,96 @@
+.pageAndSideNav {
+  display: grid;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  min-height: calc(100vh - 2 * var(--topNavHeight) - 2 * var(--container-padding));
+  grid-template-areas: ". page";
+  grid-template-columns: 250px auto;
+  grid-template-rows: 100%;
+  grid-gap: var(--container-padding);
+}
+
+.pageAndSideNav__page > * {
+  margin-bottom: var(--container-padding);
+}
+
+.pageAndSideNav__sidebar > * {
+  margin-bottom: var(--container-padding);
+  text-align: right;
+}
+
+.scrollToDiv {
+  position: relative;
+  top: calc(-1 * var(--topNavHeight) - 2 * var(--container-padding));
+  left: 0;
+}
+
+.sideBarLink {
+  margin-right: 30px;
+  font-size: 1.4rem;
+  user-select: none;
+  -webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  transition: 200ms ease;
+  -webkit-transition: 200ms ease;
+  -o-transition: 200ms ease;
+  -moz-transition: 200ms ease;
+  -ms-transition: 200ms ease;
+}
+
+.sideBarLink:hover {
+  cursor: pointer;
+}
+
+.pageAndSideNav__sidebar .inViewLink:first-child,
+.pageAndSideNav__sidebar :not(.inViewLink) + .inViewLink {
+  font-size: 1.45rem;
+  font-weight: bold;
+  position: relative;
+}
+
+.pageAndSideNav__sidebar .inViewLink:first-child::after,
+.pageAndSideNav__sidebar :not(.inViewLink) + .inViewLink::after {
+  content: '';
+  position: absolute;
+  left: calc(100% + 5px);
+  width: 25px;
+  height: 25px;
+  clip-path: polygon(40% 0%, 40% 20%, 100% 20%, 100% 80%, 40% 80%, 40% 100%, 0% 50%);
+  background-color: white;
+  border: 1px solid white;
+  vertical-align: center;
+}
+
+.pageAndSideNav__sidebar {
+  padding: var(--container-padding);
+  background-color: var(--dark-color);
+  border-radius: 5px; 
+  grid-area: sidebar;
+  position: fixed;
+  width: 250px;
+  height: calc(100vh - var(--topNavHeight) * 2 - var(--container-padding) * 2);
+  left: var(--container-padding);
+  top: calc(var(--topNavHeight) + var(--container-padding));
+}
+
+.pageAndSideNav__page {
+  padding: var(--container-padding);
+  flex: 1;
+  background-color: var(--dark-color);
+  border-radius: 5px;
+  grid-area: page;
+}
+
+@media (max-width: 655px) {
+  .pageAndSideNav__sidebar {
+    display: none;
+  }
+
+  .pageAndSideNav {
+    grid-template-areas: "page";
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
+  }
+}
