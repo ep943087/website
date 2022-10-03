@@ -25,7 +25,7 @@ const SkillsContainer = styled.div`
   align-items: center;
   flex-wrap: wrap;
   width: 100%;
-  max-width: 800px;
+  max-width: 750px;
 
   > * {
     max-width: 120px;
@@ -36,6 +36,9 @@ const ImageAndTextContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-around;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 
   > * {
     width: 45%;
