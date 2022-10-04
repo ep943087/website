@@ -1,30 +1,30 @@
 export const simulationProjects: ProjectType[] = [
   {
-    imageURL: '',
-    linkURL: 'https://ep943087.github.io/typing-game/',
+    imageURL: '/gravity.png',
+    linkURL: 'http://ada.cameron.edu/practice/gravity',
     externalLink: true,
-    caption: 'Typing Game'
+    caption: 'Gravity'
   },
   {
-    imageURL: '',
+    imageURL: '/sorting.png',
     linkURL: 'https://ep943087.github.io/sorting_simulation/',
     externalLink: true,
     caption: 'Sorting Simulation',
   },
   {
-    imageURL: '',
+    imageURL: '/maze-generation.png',
     linkURL: 'https://ep943087.github.io/maze-generation/',
     externalLink: true,
     caption: 'Maze Generation',
   },
   {
-    imageURL: '',
+    imageURL: '/binary-search-tree.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/binary_tree/',
     externalLink: true,
     caption: 'Binary Tree',
   },
   {
-    imageURL: '',
+    imageURL: '/path-finding.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/pathfinding/',
     externalLink: true,
     caption: 'Path Finding',
@@ -33,61 +33,72 @@ export const simulationProjects: ProjectType[] = [
 
 export const gameProjects: ProjectType[] = [
   {
-    imageURL: '',
+    imageURL: '/multiplayer-snake-game.png',
     linkURL: 'https://ep-snakegame.herokuapp.com/',
     externalLink: true,
     caption: 'Multiplayer Snake Game',
   },
   {
-    imageURL: '',
+    imageURL: '/elias-nightmare-typing-game.png',
     linkURL: 'https://ep943087.github.io/typing-game/',
     externalLink: true,
     caption: 'Typing Game'
   },
   {
-    imageURL: '',
+    imageURL: '/pac-man.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/pacman/',
     externalLink: true,
     caption: 'Pac-Man',
   },
   {
-    imageURL: '',
+    imageURL: '/tetris.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/tetris/',
     externalLink: true,
     caption: 'Tetris',
   },
   {
-    imageURL: '',
+    imageURL: '/minesweeper.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/minesweeper/',
     externalLink: true,
     caption: 'Minesweeper',
+    darkText: true,
   },
 ];
 
 export const mathProjects = [
   {
-    imageURL: '',
+    imageURL: '/graphing-calculator.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/graphing/',
     externalLink: true,
-    caption: 'Graphing Calculator'
+    caption: 'Graphing Calculator',
+    darkText: true,
   },
   {
-    imageURL: '',
+    imageURL: '/polar-graphing.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/polar/',
     externalLink: true,
     caption: 'Polar Coordinates',
+    darkText: true,
   },
   {
-    imageURL: '',
+    imageURL: '/chaos-game.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/chaosgame/',
     externalLink: true,
     caption: 'Chaos Game',
   },
   {
-    imageURL: '',
+    imageURL: '/sudoku-solver.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/sudoku/',
     externalLink: true,
     caption: 'Sudoku Solver',
+    darkText: true,
+  },
+  {
+    imageURL: '/logic-gates.png',
+    linkURL: 'http://ada.cameron.edu/~ep943087/practice/logicGates/',
+    externalLink: true,
+    caption: 'Logic Gates',
+    darkText: true,
   }
 ];
 
@@ -96,4 +107,5 @@ export interface ProjectType {
   linkURL: string,
   externalLink: boolean,
   caption: string,
+  darkText?: boolean,
 };

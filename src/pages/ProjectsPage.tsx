@@ -21,15 +21,15 @@ const ProjectsContainer = styled.div`
 `;
 
 const ProjectContainer = styled.div`
-  width: 300px;
-  height: 300px;
+  width: 250px;
+  height: 250px;
   border: 1px solid black;
   margin: 5px;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: auto;
+  background-size: cover;
   background-color: var(--light-color);
-  color: var(--dark-color);
+  color: var(--light-color);
   border-radius: 5px;
   transition: 600ms ease;
   -webkit-transition: 600ms ease;
@@ -38,8 +38,8 @@ const ProjectContainer = styled.div`
   -o-transition: 600ms ease;
   padding: 10px;
   &:hover {
-    width: 310px; 
-    height: 310px;
+    width: 270px; 
+    height: 270px;
   }
 `;
 
@@ -47,8 +47,8 @@ const renderProjectsList = (projects: ProjectType[]) => (
   <ProjectsContainer>
     {projects.map((project, index) =>
       <a key={index} href={project.linkURL} target="_blank" rel="noreferrer">
-        <ProjectContainer style={{ backgroundImage: `url(${project.imageURL})`}}>
-          <Typography variant="subheading" color="var(--dark-color)">{project.caption}</Typography>
+        <ProjectContainer style={{ backgroundImage: `url(${project.imageURL})` }}>
+          <Typography color={`var(--${project.darkText ? 'dark' : 'light'}-color)`} variant="subheading">{project.caption}</Typography>
         </ProjectContainer>
       </a>
     )}

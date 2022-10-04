@@ -21,8 +21,16 @@
 
 .scrollToDiv {
   position: relative;
-  top: calc(-1 * var(--topNavHeight) - 2 * var(--container-padding));
+  margin: 0;
+  padding: 0;
   left: 0;
+  top: calc(0);
+}
+
+/* First scrollToDiv will go to the top of page */
+.scrollToDiv:first-child,
+:not(.scrollToDiv) + .scrollToDiv {
+  top: calc(-1 * var(--topNavHeight) - 2 * var(--container-padding));  
 }
 
 .sideBarLink {
@@ -43,10 +51,13 @@
   cursor: pointer;
 }
 
+.pageAndSideNav__sidebar .inViewLink {
+  font-size: 1.7rem;
+  font-weight: bold;
+}
+
 .pageAndSideNav__sidebar .inViewLink:first-child,
 .pageAndSideNav__sidebar :not(.inViewLink) + .inViewLink {
-  font-size: 1.45rem;
-  font-weight: bold;
   position: relative;
 }
 
