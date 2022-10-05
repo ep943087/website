@@ -1,25 +1,12 @@
 import Typography from "../utils/Typography";
 import styled from 'styled-components';
 import PageAndSideNav from "../Layout/PageAndSideNav";
-import Skill from "../utils/Skill";
-import CppSVG from "../utils/svg/CppSVG";
-import CSharpSVG from "../utils/svg/CSharpSVG";
-import CssSVG from "../utils/svg/CssSVG";
-import DotNetCoreSVG from "../utils/svg/dotNetCoreSVG";
-import GithubSVG from "../utils/svg/GithubSVG";
-import GitlabSVG from "../utils/svg/GitlabSVG";
-import GitSVG from "../utils/svg/GitSVG";
-import HtmlSVG from "../utils/svg/HtmlSVG";
-import JavaScriptSVG from "../utils/svg/JavaScriptSVG";
-import MySqlSVG from "../utils/svg/MySqlSVG";
-import PhpSVG from "../utils/svg/PhpSVG";
-import PythonSVG from "../utils/svg/PythonSVG";
-import ReactSVG from "../utils/svg/ReactSVG";
-import TypeScriptSVG from "../utils/svg/TypeScriptSVG";
+import Skill, { SkillProps } from "../utils/Skill";
 import { SideBarLinkProps } from "../utils/SideBarLink";
 import React, { createRef } from "react";
 import PaycomSVG from "../utils/svg/PaycomSVG";
 import CameronSVG from "../utils/svg/CameronSVG";
+import { frameworkSkills, languageSkills, toolSkills } from "../config/skills";
 
 const SkillsContainer = styled.div`
   display: flex;
@@ -104,6 +91,14 @@ const renderSVG = (svg: React.ReactNode, link: string) => {
     </a>
   );
 };
+
+const renderSkillsList = (skills: SkillProps[]) => (
+  <SkillsContainer>
+    {skills.sort((a, b) => b.stars - a.stars).map(skill=> (
+      <Skill { ...skill }/>
+    ))}
+  </SkillsContainer>
+);
 
 const LandingPage = () => {
 
@@ -207,88 +202,15 @@ const LandingPage = () => {
       <div className="center-column">
         <div ref={languageRef} className="scrollToDiv" />
         <Typography variant="title" textAlign="center">Languages</Typography>
-        <SkillsContainer>
-          <Skill
-            svg={<PhpSVG />}
-            stars={4.5}
-            title={"PHP"}
-          />
-          <Skill
-            svg={<MySqlSVG />}
-            stars={4.5}
-            title="MySQL"
-          />
-          <Skill
-            svg={<TypeScriptSVG />}
-            stars={4.5}
-            title="TypeScript"
-          />
-          <Skill
-            svg={<JavaScriptSVG />}
-            stars={5}
-            title="JavaScript"
-          />
-          <Skill
-            svg={<CppSVG />}
-            stars={3}
-            title="C++"
-          />
-          <Skill
-            svg={<CSharpSVG />}
-            stars={3}
-            title="C#"
-          />
-          <Skill
-            svg={<PythonSVG />}
-            stars={3}
-            title="Python"
-          />
-          <Skill
-            svg={<CssSVG />}
-            stars={4.5}
-            title="CSS"
-          />
-          <Skill
-            svg={<HtmlSVG />}
-            stars={5}
-            title="HTML"
-          />
-        </SkillsContainer>
+        {renderSkillsList(languageSkills)}
 
         <div ref={frameworksRef} className="scrollToDiv" />
         <Typography variant="title" textAlign="center">Frameworks</Typography>
-        <SkillsContainer>
-          <Skill
-            svg={<DotNetCoreSVG />}
-            stars={2.5}
-            title="ASP.NET Core"
-          />
-          <Skill
-            svg={<ReactSVG />}
-            stars={4.5}
-            title="React"
-          />
-        </SkillsContainer>
+        {renderSkillsList(frameworkSkills)}
         
         <div ref={toolsRef} className="scrollToDiv" />
         <Typography variant="title" textAlign="center">Tools</Typography>
-        <SkillsContainer>
-          <Skill
-            svg={<GitSVG />}
-            stars={4.5}
-            title="Git"
-          />
-          <Skill
-            svg={<GitlabSVG />}
-            stars={4.5}
-            title="GitLab"
-          />
-          <Skill
-            svg={<GithubSVG />}
-            stars={4.5}
-            title="GitHub"
-          />
-        </SkillsContainer>
+        {renderSkillsList(toolSkills)}
       </div>
     </PageAndSideNav>
   )

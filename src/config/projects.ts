@@ -1,7 +1,7 @@
 export const simulationProjects: ProjectType[] = [
   {
     imageURL: '/gravity.png',
-    linkURL: 'http://ada.cameron.edu/practice/gravity',
+    linkURL: 'http://ada.cameron.edu/~ep943087/practice/gravity',
     externalLink: true,
     caption: 'Gravity'
   },

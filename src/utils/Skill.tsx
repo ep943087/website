@@ -33,7 +33,7 @@ const Skill = (props: SkillProps) => {
     <SkillContainer>
       <Typography variant="body">{props.title}</Typography>
       <div className="svg">
-        {props.svg}
+        <props.svg />
       </div>
       <StarsContainer className="star-container">
         {[1,2,3,4,5].map(index => {
@@ -50,10 +50,10 @@ const Skill = (props: SkillProps) => {
   );
 };
 
-interface SkillProps {
+export interface SkillProps {
   title: string,
   stars: StarsType,
-  svg: React.ReactNode,
+  svg: () => JSX.Element,
 }
 
 export default Skill;
