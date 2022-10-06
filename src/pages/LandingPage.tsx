@@ -178,26 +178,26 @@ const LandingPage = () => {
         </Typography>
       </WorkAndDateContainer>
 
-      <div ref={educationRef} className="scrollToDiv" />
+      <div ref={educationRef} className="scrollToDiv" style={{ marginTop: 'var(--container-padding)' }} />
       <Typography variant="title" textAlign="center">Education</Typography>
       {renderSVG(<CameronSVG />, "https://cameron.edu")}
-      <WorkAndDateContainer style={{margin: '0 auto'}}>
-        <Typography variant="subheading">Bachelor&apos;s Degree in Computer Science</Typography>
-        <Typography variant="subheading">January 2017 - May 2021</Typography>
-      </WorkAndDateContainer>
-      <WorkAndDateContainer style={{margin: '0 auto'}}>
-        <Typography variant="subheading">Minor in Criminal Justice</Typography>
-        <Typography variant="subheading">January 2017 - May 2021</Typography>
-      </WorkAndDateContainer>
-      <WorkAndDateContainer style={{margin: '0 auto'}}>
-        <Typography variant="subheading">Associate&apos;s Degree in Information Technology</Typography>
-        <Typography variant="subheading">January 2017 - May 2021</Typography>
-      </WorkAndDateContainer>
-      <WorkHistoryText>
+      <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+        <Typography variant="subheading" textAlign="center">January 2017 - May 2021</Typography>
+        <ul>
+          <li>
+            <Typography variant="subheading">Bachelor&apos;s Degree in Computer Science</Typography>
+          </li>
+          <li>
+            <Typography variant="subheading">Minor in Criminal Justice</Typography>
+          </li>
+          <li>
+            <Typography variant="subheading">Associate&apos;s Degree in Information Technology</Typography>
+          </li>
+        </ul>
         <Typography variant="body" isBlock>
           Graduated at Cameron University with a 4.0 GPA.
         </Typography>
-      </WorkHistoryText>
+      </div>
 
       <div className="center-column">
         <div ref={languageRef} className="scrollToDiv" />

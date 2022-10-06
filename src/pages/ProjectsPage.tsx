@@ -38,8 +38,8 @@ const ProjectContainer = styled.div`
   -o-transition: 600ms ease;
   padding: 10px;
   &:hover {
-    width: 270px; 
-    height: 270px;
+    width: 255px; 
+    height: 255px;
   }
 `;
 

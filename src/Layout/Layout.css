@@ -119,11 +119,18 @@ html {
 .footer {
   z-index: 1;
   background-color: var(--dark-color);
-  height: var(--topNavHeight);
+  min-height: var(--topNavHeight);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   opacity: var(--opacity);
+  padding: var(--container-padding);
+}
+
+@media (max-width: 655px) {
+  .footer {
+    flex-direction: column;
+  }
 }
 
 .center {
