@@ -114,9 +114,13 @@ class Simulation {
     return grid;
   }
 
-  private cellIsWall(cell: Cell, target: Block) {
+  private cellIsWall(cell: Cell, target: Block, targetPathLength: number) {
     const blockCell = new Block(cell.getRow(), cell.getCol());
-    return this.snake.getBody().some((block) => !Block.compare(block, target) && Block.compare(block, blockCell));
+    return this.snake.getBody().some((block, index, blocks) => {
+      const isOverBlock = Block.compare(block, blockCell);
+      const blockWontBeThere = (targetPathLength - (blocks.length - index)) >= 1;
+      return !Block.compare(block, target) && isOverBlock && !blockWontBeThere;
+    });
   }
 
   // return true if path exists, else false
@@ -156,7 +160,13 @@ class Simulation {
       }
 
       currentCell.getNeighbors().forEach((neighbor: Cell) => {
-        if (this.cellIsWall(neighbor, targetBlock) || closedList.includes(neighbor)) {
+        let neighborPathLength = 1;
+        let neighborPath: Cell | null = currentCell;
+        while (neighborPath) {
+          neighborPathLength++;
+          neighborPath = neighborPath.getPrevious();
+        }
+        if (this.cellIsWall(neighbor, targetBlock, neighborPathLength) || closedList.includes(neighbor)) {
           return;
         }
 

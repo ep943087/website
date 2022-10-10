@@ -55,7 +55,7 @@ class Drawing {
   drawSnake() {
     const snake = this.simulation.getSnake();
     const body = snake.getBody();
-    const color = this.simulation.isPathToFruitOrTail() ? 'green' : 'purple';
+    const color = this.simulation.isPathToFruitOrTail() ? 'green' : 'white';
 
     const maxWidth = .9;
     const minWidth = .25;

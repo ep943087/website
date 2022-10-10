@@ -11,28 +11,13 @@ const useEvents = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     const simulation = new Simulation(canvas);
     const drawing = new Drawing(canvas, simulation);
     const drawInterval = setInterval(drawing.draw);
-    const updateInterval = setInterval(simulation.update, 20);
-
-    const handleKeyDownEvent = (event: KeyboardEvent) => {
-      const snake = simulation.getSnake();
-      if (event.key === 'a') {
-        snake.setDirectionLeft();
-      } else if (event.key === 'd') {
-        snake.setDirectionRight();
-      } else if (event.key === 'w') {
-        snake.setDirectionUp();
-      } else if (event.key === 's') {
-        snake.setDirectionDown();
-      }
-    }
+    const updateInterval = setInterval(simulation.update, 50);
 
     window.addEventListener('resize', simulation.initialize);
-    document.addEventListener('keydown', handleKeyDownEvent);
     return () => {
       clearInterval(drawInterval);
       clearInterval(updateInterval);
       window.removeEventListener('resize', simulation.initialize);
-      document.removeEventListener('keydown', handleKeyDownEvent);
     }
   }, [canvasRef]);
 

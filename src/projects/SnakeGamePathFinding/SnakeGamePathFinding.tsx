@@ -21,7 +21,7 @@ const CanavsWrapper = styled.div`
   margin: 0 auto;
   width: 100%;
   height: 100%;
-  max-width: 900px;
+  max-width: 600px;
   max-height: 300px;
   transition: none;
   -webkit-transition: none;
