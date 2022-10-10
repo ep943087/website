@@ -1,5 +1,11 @@
 export const simulationProjects: ProjectType[] = [
   {
+    imageURL: '/path-finding-snake-game.png',
+    linkURL: '/projects/snake-game-path-finding',
+    externalLink: false,
+    caption: 'Path Finding Snake',
+  },
+  {
     imageURL: '/gravity.png',
     linkURL: 'http://ada.cameron.edu/~ep943087/practice/gravity',
     externalLink: true,

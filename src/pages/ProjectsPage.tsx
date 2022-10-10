@@ -4,6 +4,7 @@ import Typography from '../utils/Typography';
 import PageAndSideNav from '../Layout/PageAndSideNav';
 import { createRef } from 'react';
 import { SideBarLinkProps } from '../utils/SideBarLink';
+import { Link } from 'react-router-dom';
 
 const ProjectsContainer = styled.div`
   display: flex;
@@ -38,20 +39,32 @@ const ProjectContainer = styled.div`
   -o-transition: 600ms ease;
   padding: 10px;
   &:hover {
-    width: 255px; 
-    height: 255px;
+    border: 1px solid white;
   }
 `;
 
 const renderProjectsList = (projects: ProjectType[]) => (
   <ProjectsContainer>
-    {projects.map((project, index) =>
-      <a key={index} href={project.linkURL} target="_blank" rel="noreferrer">
+    {projects.map((project, index) => {
+      const projectContent = (
         <ProjectContainer style={{ backgroundImage: `url(${project.imageURL})` }}>
           <Typography color={`var(--${project.darkText ? 'dark' : 'light'}-color)`} variant="subheading">{project.caption}</Typography>
         </ProjectContainer>
-      </a>
-    )}
+      );
+      if (project.externalLink) {
+        return (
+          <a key={index} href={project.linkURL} target="_blank" rel="noreferrer">
+            {projectContent}
+          </a>
+        );
+      } else {
+        return (
+          <Link to={project.linkURL}>
+            {projectContent}
+          </Link>
+        );
+      }
+    })}
   </ProjectsContainer>
 );
 
