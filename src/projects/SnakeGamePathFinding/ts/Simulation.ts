@@ -1,6 +1,7 @@
 import Block from "./Block";
 import Snake from "./Snake";
 import Cell from "./Cell";
+import DeadBall from "./DeadBall";
 
 class Simulation {
   private rows: number;
@@ -9,7 +10,8 @@ class Simulation {
   private snake: Snake;
   private fruit: Block;
   private path: Cell[] = [];
-  private isChasingTail: boolean = false;
+  private gameOver: boolean = false;
+  private deadBalls: DeadBall[][] = [];
 
   constructor(private canvas: HTMLCanvasElement) {
     this.rows = 0;
@@ -24,11 +26,26 @@ class Simulation {
   public initialize = () => {
     this.canvas.width = this.canvas.offsetWidth;
     this.canvas.height = this.canvas.offsetHeight;
+    this.gameOver = false;
 
     this.rows = Math.floor(this.canvas.height / this.cellLength);
     this.cols = Math.floor(this.canvas.width / this.cellLength); 
     this.snake.initialize(this.rows / 2, this.cols / 2);
     this.initializeFruit();
+  }
+
+  public initializeDeadBalls() {
+    this.deadBalls = [];
+    const cellLength = this.cellLength;
+    const halfLength = this.cellLength / 2;
+    this.snake.getBody().forEach((block) => {
+      const deadBalls = [];
+      for (let i=0;i<DeadBall.deadBallPerBlock;i++) {
+        const [y, x] = [block.getRow()*cellLength + halfLength, block.getCol()*cellLength + halfLength];
+        deadBalls.push(new DeadBall(x, y));
+      }
+      this.deadBalls.push(deadBalls);
+    });
   }
 
   public initializeFruit() {
@@ -50,21 +67,29 @@ class Simulation {
 
   public getSnake() { return this.snake; }
   public getFruit() { return this.fruit; }
-  public getIsChasingTail() { return this.isChasingTail; }
 
   public update = (): void => {
+    if (this.gameOver) {
+      this.deadBalls.forEach(deadBalls => deadBalls.forEach(deadBall => deadBall.update()));
+      return;
+    }
     this.decideNextMove();
     this.snake.move();
     
     if (this.isSnakeOutOfBounds() || this.snakeCrashedIntoBody()) {
-      this.initialize();
-    }
-
-    if (this.isEatingFruit()) {
+      this.gameOver = true;
+      this.initializeDeadBalls();
+      setTimeout(() => {
+        this.initialize();
+      }, 4000);
+    } else if (this.isEatingFruit()) {
       this.snake.grow();
       this.initializeFruit();
     }
-    this.decideNextMove();
+
+    if (!this.gameOver) {
+      this.decideNextMove();
+    }
   }
 
   private snakeCrashedIntoBody(): boolean {
@@ -87,6 +112,14 @@ class Simulation {
 
   public getPath() {
     return this.path;
+  }
+
+  public getDeadBalls() {
+    return this.deadBalls;
+  }
+
+  public getGameOver() {
+    return this.gameOver;
   }
 
   public isPathToFruitOrTail() {
@@ -196,12 +229,19 @@ class Simulation {
   }
 
   decideNextMove(): void {
-    this.isChasingTail = false;
     this.calculatePathToTarget(this.fruit);
     if (this.path.length === 0) {
       this.calculatePathToTarget(this.snake.getTail());
-      this.isChasingTail = true;
     }
+
+    /* CODE TO CHOOSE THE NEXT BODY PART AFTER TAIL, ALMOST ALWAYS DIES
+      let i = this.snake.getBody().length - 1;
+
+      while ((this.path.length === 0) || (i > 0 && i < this.snake.getBody().length - 1 && this.path.length <= 2)) {
+        this.calculatePathToTarget(this.snake.getBody()[i]);
+        i--;
+      }
+    */
 
     if (this.path.length > 0) {
       const currentPosition = this.path[0];

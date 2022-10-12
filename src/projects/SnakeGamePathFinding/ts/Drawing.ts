@@ -52,17 +52,36 @@ class Drawing {
     this.ctx.fillRect(sX, sY, length, length);
   }
 
+  calculateSnakeBlockColor(index: number) {
+    const snakeBody = this.simulation.getSnake().getBody();
+    const hueValue = Math.floor(360 * index / snakeBody.length);
+    return `hsl(${hueValue}, 100%, 50%)`;
+  }
+
   drawSnake() {
     const snake = this.simulation.getSnake();
     const body = snake.getBody();
-    const color = this.simulation.isPathToFruitOrTail() ? 'green' : 'white';
 
     const maxWidth = .9;
     const minWidth = .25;
     const diffWidth = maxWidth - minWidth;
     body.forEach((block, index) => {
+      const calculateColor = this.calculateSnakeBlockColor(index);
+      const color = this.simulation.isPathToFruitOrTail() ? calculateColor : 'white';
       const percent = ((body.length - index) / body.length) * diffWidth + minWidth;
       this.drawBlock(block, color, percent);
+    });
+  }
+
+  drawDeadBalls() {
+    this.simulation.getDeadBalls().forEach((deadBalls, index) => {
+      const color = this.calculateSnakeBlockColor(index);
+      this.ctx.fillStyle = color;
+
+      deadBalls.forEach(ball => {
+        const { x, y } = ball.getDimensions();
+        this.ctx.fillRect(x, y, 4, 4);
+      });
     });
   }
 
@@ -76,7 +95,7 @@ class Drawing {
     if (path.length === 0) {
       return;
     }
-    const color = this.simulation.getIsChasingTail() ? 'blue' : 'orange';
+    const color = 'orange';
 
     this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = color;
@@ -101,10 +120,15 @@ class Drawing {
     const { x: gridEndX, y: gridEndY } = this.convertRowColXY(rows, cols);
     this.ctx.translate((this.canvas.width - gridEndX) / 2, (this.canvas.height - gridEndY) / 2);
 
-    this.drawPath();
-    this.drawFruit();
-    this.drawSnake();
-    this.drawGrid();
+    if (this.simulation.getGameOver()) {
+      this.drawFruit();
+      this.drawDeadBalls();
+    } else {
+      this.drawPath();
+      this.drawFruit();
+      this.drawSnake();
+    }
+    //this.drawGrid();
     this.ctx.restore();
   }
 }
