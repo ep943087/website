@@ -5,7 +5,11 @@ class Drawing {
 
   private ctx: CanvasRenderingContext2D;
 
-  constructor(private canvas: HTMLCanvasElement, private simulation: Simulation) {
+  constructor(
+    private canvas: HTMLCanvasElement,
+    private simulation: Simulation,
+    private snakeType: HTMLSelectElement,
+  ) {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
   }
 
@@ -53,9 +57,23 @@ class Drawing {
   }
 
   calculateSnakeBlockColor(index: number) {
-    const snakeBody = this.simulation.getSnake().getBody();
-    const hueValue = Math.floor(360 * index / snakeBody.length);
-    return `hsl(${hueValue}, 100%, 50%)`;
+    const { rows, cols } = this.simulation.getDimensions();
+    const snake = this.simulation.getSnake();
+    const snakeBody = snake.getBody();
+    if (this.snakeType.value === 'green') {
+      return 'green';
+    } else if (this.snakeType.value === 'color-length') {
+      const snakeBody = this.simulation.getSnake().getBody();
+      const hueValue = Math.floor(360 * index / snakeBody.length);
+      return `hsl(${hueValue}, 100%, 50%)`;
+    } else if (this.snakeType.value === 'color-position') {
+      const distance = Math.sqrt(Math.pow(snakeBody[index].getRow(), 2) + Math.pow(snakeBody[index].getCol(), 2));
+      const maxDistance = Math.sqrt(Math.pow(rows, 2) + Math.pow(cols, 2));
+      const hueValue = Math.floor(360 * distance / maxDistance);
+      return `hsl(${hueValue}, 100%, 50%)`;
+    }
+
+    return 'green';
   }
 
   drawSnake() {

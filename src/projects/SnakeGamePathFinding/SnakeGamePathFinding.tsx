@@ -1,7 +1,9 @@
-import { createRef } from "react";
+import React, { createRef } from "react";
 import styled from "styled-components";
+import { OptionType } from "../../forms/Select";
 import Page from "../../Layout/Page";
 import Typography from "../../utils/Typography";
+import { snakeTypeOptions } from "./types";
 import useEvents from "./useEvents";
 
 const CanvasContainer = styled.canvas`
@@ -40,14 +42,51 @@ const SnakeGameContainer = styled.div`
   -ms-transition: none;
 `;
 
+const SelectContainer = styled.select`
+  color: black;
+  padding: 5px;
+  border-radius: 5px;
+`;
+
+const ControlsContainer = styled.div`
+  display: block;
+  option {
+    color: black;
+  }
+`;
+
+const SelectLabelContainer = styled.div`
+  width: 300px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const renderSelectOption = (label: string, options: OptionType[], selectRef: React.RefObject<HTMLSelectElement>) => (
+  <SelectLabelContainer>
+    <label>{label}</label>
+    <SelectContainer ref={selectRef}>
+      {options.map(option => (
+        <option value={option.value}>{option.label}</option>
+      ))}
+    </SelectContainer>
+  </SelectLabelContainer>
+);
+
 const SnakeGamePathFinding = () => {
 
   const canvasRef = createRef<HTMLCanvasElement>();
-  useEvents(canvasRef);
+  const snakeTypeRef = createRef<HTMLSelectElement>();
+
+  useEvents(canvasRef, snakeTypeRef);
 
   return (
     <Page>
       <Typography variant="title" textAlign="center">Path Finding Snake</Typography>
+      <ControlsContainer>
+        {renderSelectOption('Snake Type', snakeTypeOptions, snakeTypeRef)}
+      </ControlsContainer>
       <SnakeGameContainer>
         <CanavsWrapper>
           <CanvasContainer ref={canvasRef} className="snake-game" />

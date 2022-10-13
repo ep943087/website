@@ -11,6 +11,7 @@
   --light-color: #dedede;
   --opacity: .94;
   --topNavHeight: 75px;
+  --inputPadding: 5px;
 }
 
 html {

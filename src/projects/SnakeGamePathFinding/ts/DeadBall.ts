@@ -1,8 +1,8 @@
 class DeadBall {
   private xV: number = 0;
   private yV: number = 0;
-  private static velocity = 9;
-  public static deadBallPerBlock = 6;
+  private static velocity = 25;
+  public static deadBallPerBlock = 3;
 
   constructor(private x: number, private y: number) {
     const angle = 2 * Math.PI * Math.random();
@@ -16,6 +16,7 @@ class DeadBall {
   {
     this.x += this.xV;
     this.y += this.yV;
+    this.yV += 3;
   }
 
 };

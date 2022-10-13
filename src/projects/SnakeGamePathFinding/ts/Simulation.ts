@@ -81,7 +81,7 @@ class Simulation {
       this.initializeDeadBalls();
       setTimeout(() => {
         this.initialize();
-      }, 4000);
+      }, 1500);
     } else if (this.isEatingFruit()) {
       this.snake.grow();
       this.initializeFruit();
