@@ -19,8 +19,8 @@ export const simulationProjects: ProjectType[] = [
   },
   {
     imageURL: '/maze-generation.png',
-    linkURL: 'https://ep943087.github.io/maze-generation/',
-    externalLink: true,
+    linkURL: '/projects/maze-generation',
+    externalLink: false,
     caption: 'Maze Generation',
   },
   {

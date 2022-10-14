@@ -19,7 +19,7 @@ const CanvasContainer = styled.canvas`
   -ms-transition: none;
 `;
 
-const CanavsWrapper = styled.div`
+const CanvasWrapper = styled.div`
   margin: 0 auto;
   width: 100%;
   height: 100%;
@@ -46,19 +46,24 @@ const SelectContainer = styled.select`
   color: black;
   padding: 5px;
   border-radius: 5px;
+  option {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 5px;
+    color: black;
+  }
 `;
 
 const ControlsContainer = styled.div`
   display: block;
-  option {
-    color: black;
-  }
 `;
 
 const SelectLabelContainer = styled.div`
   width: 300px;
   margin: 0 auto;
   display: flex;
+  align-items: center;
   flex-direction: row;
   justify-content: space-between;
 `;
@@ -88,9 +93,9 @@ const SnakeGamePathFinding = () => {
         {renderSelectOption('Snake Type', snakeTypeOptions, snakeTypeRef)}
       </ControlsContainer>
       <SnakeGameContainer>
-        <CanavsWrapper>
+        <CanvasWrapper>
           <CanvasContainer ref={canvasRef} className="snake-game" />
-        </CanavsWrapper>
+        </CanvasWrapper>
       </SnakeGameContainer>
     </Page>
   );
