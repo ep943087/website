@@ -64,7 +64,7 @@ class Drawing {
         if (this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance) {
           this.ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;
         } else if (this.dijkstraDiplay.value === DijkstraDisplayType.colorFul) {
-          this.ctx.fillStyle = `hsl(${opacity * 275}, 50%, 50%)`;
+          this.ctx.fillStyle = `hsl(${opacity * 260}, 50%, 50%)`;
         }
         this.ctx.fillRect(x, y, cellLength, cellLength);
       });

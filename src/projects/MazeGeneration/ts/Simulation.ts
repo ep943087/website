@@ -120,6 +120,27 @@ class Simulation {
     }
   }
 
+  removeDuplicatesInFadingCells() {
+    for (let i=this.fadingCells.length - 1;i>=0;i--) {
+      const existsIndex = this.fadingCells.findIndex(
+        cell => cell !== this.fadingCells[i] && cell.getRow() === this.fadingCells[i].getRow()
+          && cell.getCol() === this.fadingCells[i].getCol()
+      );
+      if (existsIndex >= 0) {
+        this.fadingCells.splice(existsIndex, 1);
+        i--;
+      }
+    }
+  }
+
+  addToFadingCells(addCell: Cell) {
+    const findIndex = this.fadingCells.findIndex(cell => cell.getRow() === addCell.getRow() && cell.getCol() === addCell.getCol());
+    if (findIndex >= 0) {
+      this.fadingCells.splice(findIndex, 1);
+    }
+    this.fadingCells.push(new FadingCell(addCell.getRow(), addCell.getCol()));
+  }
+
   update = () => {
     for (let i=this.fadingCells.length - 1;i>=0;i--) {
       this.fadingCells[i].update();
@@ -206,7 +227,7 @@ class Simulation {
 
   updateAlgorithm() {
     if (this.currentCell !== undefined) {
-      this.fadingCells.push(new FadingCell(this.currentCell.getRow(), this.currentCell.getCol()));
+      this.addToFadingCells(this.currentCell);
     }
     switch (this.mazeType.value) {
       case MazeType.BinarySearchTree:
@@ -324,7 +345,7 @@ class Simulation {
         this.unlinkCell(this.currentCell, DirectionType.Right);
       }
 
-      this.unvisitedCells = this.unvisitedCells.filter(cell => cell !== neighbor);
+      this.removeCellFromUnvisitedCells(neighbor);
     }
     this.currentCell = neighbor;
     return this.generatingMaze;
@@ -376,25 +397,31 @@ class Simulation {
     }
 
     if (this.hunting) {
-      const neighbors = this.currentCell.getNeighbors().filter(neighbor => !this.unvisitedCells.includes(neighbor));
-      if (this.unvisitedCells.includes(this.currentCell) && neighbors.length > 0) {
-        const neighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
-        if (this.currentCell.getUpNeighbor() === neighbor) {
-          this.unlinkCell(this.currentCell, DirectionType.Up);
-        } else if (this.currentCell.getDownNeighbor() === neighbor) {
-          this.unlinkCell(this.currentCell, DirectionType.Down);
-        } else if (this.currentCell.getLeftNeighbor() === neighbor) {
-          this.unlinkCell(this.currentCell, DirectionType.Left);
-        } else if (this.currentCell.getRightNeighbor() === neighbor) {
-          this.unlinkCell(this.currentCell, DirectionType.Right);
-        }
-        this.removeCellFromUnvisitedCells(this.currentCell);
-        this.hunting = false;
-      } else {
-        if (this.currentCell.getCol() < this.grid.getCols() - 1) {
-          this.currentCell = this.currentCell.getRightNeighbor();
+      for (let i=0;i<this.grid.getCols();i++) {
+        if (this.currentCell === undefined) continue;
+        this.currentCell = this.grid.getMatrix()[this.currentCell.getRow()][i];
+        this.addToFadingCells(this.currentCell);
+        const neighbors = this.currentCell.getNeighbors().filter(neighbor => !this.unvisitedCells.includes(neighbor));
+        if (this.unvisitedCells.includes(this.currentCell) && neighbors.length > 0) {
+          const neighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
+          if (this.currentCell.getUpNeighbor() === neighbor) {
+            this.unlinkCell(this.currentCell, DirectionType.Up);
+          } else if (this.currentCell.getDownNeighbor() === neighbor) {
+            this.unlinkCell(this.currentCell, DirectionType.Down);
+          } else if (this.currentCell.getLeftNeighbor() === neighbor) {
+            this.unlinkCell(this.currentCell, DirectionType.Left);
+          } else if (this.currentCell.getRightNeighbor() === neighbor) {
+            this.unlinkCell(this.currentCell, DirectionType.Right);
+          }
+          this.removeCellFromUnvisitedCells(this.currentCell);
+          this.hunting = false;
+          break;
         } else {
-          this.currentCell = this.grid.getMatrix()[this.currentCell.getRow()+1][0];
+          if (this.currentCell.getCol() < this.grid.getCols() - 1) {
+            this.currentCell = this.currentCell.getRightNeighbor();
+          } else {
+            this.currentCell = this.grid.getMatrix()[this.currentCell.getRow()+1][0];
+          }
         }
       }
     } else {

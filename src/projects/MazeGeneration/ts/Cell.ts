@@ -16,6 +16,10 @@ class Cell {
     };
   }
 
+  public static compare(a: Cell, b: Cell) {
+    return a.row === b.row && a.col === b.col;
+  }
+
   getRow() { return this.row; }
   getCol() { return this.col; }
 
