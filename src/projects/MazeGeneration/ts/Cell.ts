@@ -50,10 +50,10 @@ class Cell {
   leftLinkExists() { return Boolean(this.left.cell); }
   rightLinkExists() { return Boolean(this.right.cell); }
 
-  getUpLink() { return this.up.cell }
-  getDownLink() { return this.down.cell }
-  getLeftLink() { return this.left.cell }
-  getRightLink() { return this.right.cell }
+  getUpNeighbor() { return this.up.cell }
+  getDownNeighbor() { return this.down.cell }
+  getLeftNeighbor() { return this.left.cell }
+  getRightNeighbor() { return this.right.cell }
 
   unlinkUp() {
     if (this.up.cell) {
@@ -81,6 +81,15 @@ class Cell {
       this.left.link = false;
       this.left.cell.right.link = false;
     }
+  }
+
+  getNeighbors(): Cell[] {
+    return ([
+      this.getLeftNeighbor(),
+      this.getRightNeighbor(),
+      this.getUpNeighbor(),
+      this.getDownNeighbor(),
+    ].filter(cell => cell !== undefined) as Cell[]);
   }
 }
 

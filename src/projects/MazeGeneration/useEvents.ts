@@ -9,6 +9,8 @@ const useEvents = (
   drawFadingCellsRef: React.RefObject<HTMLInputElement>,
   drawFadingWallsRef: React.RefObject<HTMLInputElement>,
   instantSolutionRef: React.RefObject<HTMLInputElement>,
+  showDijkstraAlgoRef: React.RefObject<HTMLInputElement>,
+  dijkstraDiplayRef: React.RefObject<HTMLSelectElement>,
 ) => {
   useEffect(() => {
     const canvas = canvasRef.current as HTMLCanvasElement;
@@ -17,13 +19,16 @@ const useEvents = (
     const drawFadingCells = drawFadingCellsRef.current as HTMLInputElement;
     const drawFadingWalls = drawFadingWallsRef.current as HTMLInputElement;
     const instantSolution = instantSolutionRef.current as HTMLInputElement;
+    const showDijkstraAlgo = showDijkstraAlgoRef.current as HTMLInputElement;
+    const dijkstraDiplay = dijkstraDiplayRef.current as HTMLSelectElement;
 
     drawFadingCells.checked = true;
     drawFadingWalls.checked = true;
+    showDijkstraAlgo.checked = true;
 
     const simulation = new Simulation(canvas, mazeType, instantSolution);
 
-    const drawing = new Drawing(canvas, simulation, drawFadingCells, drawFadingWalls);
+    const drawing = new Drawing(canvas, simulation, drawFadingCells, drawFadingWalls, showDijkstraAlgo, dijkstraDiplay);
 
     const drawingInterval = setInterval(drawing.draw, 50);
     const updateInterval = setInterval(simulation.update, 10);
@@ -40,7 +45,11 @@ const useEvents = (
       clearInterval(updateInterval);
       window.removeEventListener('resize', simulation.update);
     }
-  }, [canvasRef, startButtonRef, mazeTypeRef]);
+  }, [
+    canvasRef, startButtonRef, mazeTypeRef, drawFadingCellsRef,
+    drawFadingWallsRef, instantSolutionRef, showDijkstraAlgoRef,
+    dijkstraDiplayRef
+  ]);
 };
 
 export default useEvents;

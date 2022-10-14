@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { OptionType } from "../../forms/Select";
 import Page from "../../Layout/Page";
 import Typography from "../../utils/Typography";
-import { mazeTypes } from "./types";
+import { dijkstraDisplayTypes, mazeTypes } from "./types";
 import useEvents from "./useEvents";
 
 const CanvasContainer = styled.canvas`
@@ -94,8 +94,19 @@ const MazeGeneration = () => {
   const drawFadingWallsRef = createRef<HTMLInputElement>();
   const drawFadingCellsRef = createRef<HTMLInputElement>();
   const instantSolutionRef = createRef<HTMLInputElement>();
+  const showDijkstraAlgoRef = createRef<HTMLInputElement>();
+  const dijkstraDiplayRef = createRef<HTMLSelectElement>();
 
-  useEvents(canvasRef, startButtonRef, mazeTypeRef, drawFadingCellsRef, drawFadingWallsRef, instantSolutionRef);
+  useEvents(
+    canvasRef,
+    startButtonRef,
+    mazeTypeRef,
+    drawFadingCellsRef,
+    drawFadingWallsRef,
+    instantSolutionRef,
+    showDijkstraAlgoRef,
+    dijkstraDiplayRef,
+  );
   return (
     <Page>
       <Typography variant="title" textAlign="center">Maze Generation</Typography>
@@ -110,6 +121,8 @@ const MazeGeneration = () => {
         {renderCheckBox('Draw Fading Walls', drawFadingWallsRef)}
         {renderCheckBox('Draw Fading Cells', drawFadingCellsRef)}
         {renderCheckBox('Instant Solution', instantSolutionRef)}
+        {renderCheckBox('Show Dijkstra\'s Algorithm', showDijkstraAlgoRef)}
+        {renderSelectOption('Dijkstra Display', dijkstraDisplayTypes, dijkstraDiplayRef)}
       </ControlsContainer>
     </Page>
   );

@@ -1,3 +1,5 @@
+import { DijkstraDisplayType } from "../types";
+import DijkstraCell from "./DijkstraCell";
 import FadingCell from "./FadingCell";
 import FadingWall from "./FadingWall";
 import Simulation from "./Simulation";
@@ -8,7 +10,10 @@ class Drawing {
   constructor(
     private canvas: HTMLCanvasElement,
     private simulation: Simulation,
-    private drawFadingCells: HTMLInputElement, private drawFadingWalls: HTMLInputElement,
+    private drawFadingCells: HTMLInputElement,
+    private drawFadingWalls: HTMLInputElement,
+    private showDijkstraAlgo: HTMLInputElement,
+    private dijkstraDiplay: HTMLSelectElement,
   ) {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
   }
@@ -17,9 +22,59 @@ class Drawing {
     return this.simulation.convertRowColToXY(row, col);
   }
 
+  drawDijkstraCellPath(dijkstraCell: DijkstraCell) {
+    const path = dijkstraCell.getPath();
+    const { cellLength } = this.simulation.getDimensions();
+    path.forEach(cell => {
+      this.ctx.fillStyle = "rgba(0, 150, 0)";
+      const { x, y } = this.convertRowColToXY(cell.getRow(), cell.getCol());
+      this.ctx.fillRect(x, y, cellLength, cellLength);
+    });
+
+    // if (path.length > 0) {
+    //   const { cX, cY } = this.convertRowColToXY(path[0].getRow(), path[0].getCol());
+    //   this.ctx.beginPath();
+    //   this.ctx.moveTo(cX, cY);
+    //   for (let i=1;i<path.length;i++) {
+    //     const { cX, cY } = this.convertRowColToXY(path[i].getRow(), path[i].getCol());
+    //     this.ctx.lineTo(cX, cY);
+    //   }
+    //   this.ctx.strokeStyle = "red";
+    //   this.ctx.stroke();
+    // }
+  }
+
   drawGrid() {
     const matrix = this.simulation.getGrid().getMatrix();
     const { rows, cols, cellLength } = this.simulation.getDimensions();
+
+    if (this.simulation.getIsMazeComplete() && this.showDijkstraAlgo.checked) {
+      const grid = this.simulation.getDijkstraGrid().flat();
+      let maxDistanceIndex = 0;
+      for (let i=1;i<grid.length;i++) {
+        if (grid[i].getDistance() > grid[maxDistanceIndex].getDistance()) {
+          maxDistanceIndex = i;
+        }
+      }
+      const maxDistance = grid[maxDistanceIndex].getDistance();
+
+      grid.forEach((dCell) => {
+        const { x, y } = this.convertRowColToXY(dCell.getRow(), dCell.getCol());
+        const opacity = dCell.getDistance() / maxDistance;
+        if (this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance) {
+          this.ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;
+        } else if (this.dijkstraDiplay.value === DijkstraDisplayType.colorFul) {
+          this.ctx.fillStyle = `hsl(${opacity * 275}, 50%, 50%)`;
+        }
+        this.ctx.fillRect(x, y, cellLength, cellLength);
+      });
+
+      if (this.dijkstraDiplay.value === DijkstraDisplayType.cornerToCornerPath) {
+        this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[rows-1][cols-1]);
+      } else if (this.dijkstraDiplay.value === DijkstraDisplayType.pathToMaxDistance) {
+        this.drawDijkstraCellPath(grid[maxDistanceIndex]);
+      }
+    }
 
     if (this.drawFadingCells.checked) {
       this.simulation.getFadingCells().forEach(cell => {
