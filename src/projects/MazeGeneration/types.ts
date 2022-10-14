@@ -4,6 +4,7 @@ export enum MazeType {
   BinarySearchTree = '0',
   SideWinder = '1',
   AldousBroder = '2',
+  Wilson = '3',
 };
 
 export enum DijkstraDisplayType {
@@ -17,6 +18,7 @@ export const mazeTypes: OptionType[] = [
   { value: MazeType.BinarySearchTree, label: 'Binary Tree' },
   { value: MazeType.SideWinder, label : 'Side-Winder' },
   { value: MazeType.AldousBroder, label: 'Aldous-Broder' },
+  { value: MazeType.Wilson, label: 'Wilson' },
 ];
 
 export const dijkstraDisplayTypes: OptionType[] = [

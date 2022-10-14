@@ -17,6 +17,7 @@ class Simulation {
   private sideWinderCellList: Cell[] = [];
   private isMazeComplete: boolean = false;
   private unvisitedCells: Cell[] = [];
+  private wilsonPath: Cell[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
@@ -59,6 +60,9 @@ class Simulation {
       case MazeType.AldousBroder:
         this.intializeAldousBroderAlgorithm();
         break;
+      case MazeType.Wilson:
+        this.initializeWilsonAlgorithm();
+        break;
     }
   }
 
@@ -72,6 +76,13 @@ class Simulation {
 
   intializeAldousBroderAlgorithm() {
     this.unvisitedCells = this.grid.getMatrix().flat();
+  }
+
+  initializeWilsonAlgorithm() {
+    this.unvisitedCells = this.grid.getMatrix().flat().filter(
+      cell => cell !== this.grid.getMatrix()[Math.floor(this.grid.getRows()/2)][Math.floor(this.grid.getCols()/2)]
+    );
+    this.wilsonPath = [];
   }
 
   convertRowColToXY(row: number, col: number) {
@@ -198,6 +209,9 @@ class Simulation {
       case MazeType.AldousBroder:
         this.updateAldousBroderAlgorithm();
         break;
+      case MazeType.Wilson:
+        this.updateWilsonAlgorithm();
+        break;
     }
 
     return this.generatingMaze;
@@ -232,6 +246,7 @@ class Simulation {
           : undefined;
       }
     }
+    return this.generatingMaze;
   }
 
   randomSideWinderCell(): Cell {
@@ -275,17 +290,13 @@ class Simulation {
         this.currentCell = undefined;
       }
     }
+    return this.generatingMaze;
   }
 
   updateAldousBroderAlgorithm() {
-    if (this.unvisitedCells.length <= 0) {
+    if (this.unvisitedCells.length <= 0 || this.currentCell === undefined) {
       this.generatingMaze = false;
-      return true;
-    }
-
-    if (this.currentCell === undefined) {
-      this.generatingMaze = false;
-      return;
+      return this.generatingMaze;
     }
 
     const neighbors = this.currentCell.getNeighbors();
@@ -304,6 +315,46 @@ class Simulation {
       this.unvisitedCells = this.unvisitedCells.filter(cell => cell !== neighbor);
     }
     this.currentCell = neighbor;
+    return this.generatingMaze;
+  }
+
+  updateWilsonAlgorithm() {
+    if (this.unvisitedCells.length <= 0 || this.currentCell === undefined) {
+      this.generatingMaze = false;
+      return this.generatingMaze;
+    }
+
+    this.wilsonPath.push(this.currentCell);
+
+    const next = this.currentCell.getRandomNeighbor();
+
+    if (this.wilsonPath.includes(next)) {
+      const nextIndex = this.wilsonPath.findIndex(cell => cell === next);
+      this.wilsonPath.splice(nextIndex);
+      this.currentCell = next;
+    } else if (!this.unvisitedCells.includes(next)) {
+      this.wilsonPath.push(next);
+      for (let i=0;i<this.wilsonPath.length-1;i++) {
+        const first = this.wilsonPath[i];
+        const second = this.wilsonPath[i+1];
+        if (first.getUpNeighbor() === second) {
+          this.unlinkCell(first, DirectionType.Up);
+        } else if (first.getDownNeighbor() === second) {
+          this.unlinkCell(first, DirectionType.Down);
+        } else if (first.getLeftNeighbor() === second) {
+          this.unlinkCell(first, DirectionType.Left);
+        } else if (first.getRightNeighbor() === second) {
+          this.unlinkCell(first, DirectionType.Right);
+        }
+      }
+
+      this.unvisitedCells = this.unvisitedCells.filter(cell => !this.wilsonPath.includes(cell));
+      this.wilsonPath = [];
+      this.currentCell = this.unvisitedCells[Math.floor(Math.random()*this.unvisitedCells.length)];
+    } else {
+      this.currentCell = next;
+    }
+    return this.generatingMaze;
   }
 };
 

@@ -91,6 +91,11 @@ class Cell {
       this.getDownNeighbor(),
     ].filter(cell => cell !== undefined) as Cell[]);
   }
+
+  getRandomNeighbor(): Cell {
+    const neighbors: Cell[] = this.getNeighbors();
+    return neighbors[Math.floor(Math.random()*neighbors.length)];
+  }
 }
 
 export default Cell;
