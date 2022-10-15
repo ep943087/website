@@ -6,6 +6,7 @@ export enum MazeType {
   AldousBroder = '2',
   Wilson = '3',
   HuntAndKill = '4',
+  RecursiveBackTracking = '5',
 };
 
 export enum DijkstraDisplayType {
@@ -21,6 +22,7 @@ export const mazeTypes: OptionType[] = [
   { value: MazeType.AldousBroder, label: 'Aldous-Broder' },
   { value: MazeType.Wilson, label: 'Wilson' },
   { value: MazeType.HuntAndKill, label: 'Hunt-and-Kill' },
+  { value: MazeType.RecursiveBackTracking, label: 'Recursive Back-Tracking' },
 ];
 
 export const dijkstraDisplayTypes: OptionType[] = [

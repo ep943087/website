@@ -19,6 +19,7 @@ class Simulation {
   private unvisitedCells: Cell[] = [];
   private wilsonPath: Cell[] = [];
   private hunting: boolean = false;
+  private backTrackingStack: Cell[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
@@ -67,6 +68,9 @@ class Simulation {
       case MazeType.HuntAndKill:
         this.initializeHuntAndKill();
         break;
+      case MazeType.RecursiveBackTracking:
+        this.initializeRecursiveBackTracking();
+        break;
     }
   }
 
@@ -92,6 +96,11 @@ class Simulation {
   initializeHuntAndKill() {
     this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
     this.hunting = false;
+  }
+
+  initializeRecursiveBackTracking() {
+    this.backTrackingStack = [this.currentCell as Cell];
+    this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
   }
 
   convertRowColToXY(row: number, col: number) {
@@ -174,7 +183,7 @@ class Simulation {
   };
 
   performDijkstraAlgorithm() {
-    const startCell: DijkstraCell = this.dijkstraGrid[Math.floor(0)][Math.floor(0)];
+    const startCell: DijkstraCell = this.dijkstraGrid[Math.floor(this.grid.getRows()-1)][Math.floor(0)];
     startCell.setDistance(0);
 
     const openList: DijkstraCell[] = this.dijkstraGrid.flat();
@@ -244,6 +253,9 @@ class Simulation {
         break;
       case MazeType.HuntAndKill:
         this.updateHuntAndKill();
+        break;
+      case MazeType.RecursiveBackTracking:
+        this.updateRecursiveBackTracking();
         break;
     }
 
@@ -443,6 +455,37 @@ class Simulation {
         this.removeCellFromUnvisitedCells(next);
         this.currentCell = next;
       }
+    }
+
+    return this.generatingMaze;
+  }
+
+  updateRecursiveBackTracking() {
+    if (!this.generatingMaze || this.currentCell === undefined) {
+      this.generatingMaze = false;
+      return this.generatingMaze;
+    }
+
+    const neighbors = this.currentCell.getNeighbors().filter(cell => this.unvisitedCells.includes(cell));
+
+    if (neighbors.length > 0) {
+      const neighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
+      if (this.currentCell.getUpNeighbor() === neighbor) {
+        this.unlinkCell(this.currentCell, DirectionType.Up);
+      } else if (this.currentCell.getDownNeighbor() === neighbor) {
+        this.unlinkCell(this.currentCell, DirectionType.Down);
+      } else if (this.currentCell.getLeftNeighbor() === neighbor) {
+        this.unlinkCell(this.currentCell, DirectionType.Left);
+      } else if (this.currentCell.getRightNeighbor() === neighbor) {
+        this.unlinkCell(this.currentCell, DirectionType.Right);
+      }
+      this.currentCell = neighbor;
+      this.removeCellFromUnvisitedCells(neighbor);
+      this.backTrackingStack.push(this.currentCell);
+    } else if (this.backTrackingStack.length > 0) {
+      this.currentCell = this.backTrackingStack.pop();
+    } else {
+      this.generatingMaze = false;
     }
 
     return this.generatingMaze;
