@@ -24,24 +24,20 @@ class Drawing {
 
   drawDijkstraCellPath(dijkstraCell: DijkstraCell) {
     const path = dijkstraCell.getPath();
-    const { cellLength } = this.simulation.getDimensions();
-    path.forEach(cell => {
-      this.ctx.fillStyle = "rgba(0, 150, 0)";
-      const { x, y } = this.convertRowColToXY(cell.getRow(), cell.getCol());
-      this.ctx.fillRect(x, y, cellLength, cellLength);
-    });
 
-    // if (path.length > 0) {
-    //   const { cX, cY } = this.convertRowColToXY(path[0].getRow(), path[0].getCol());
-    //   this.ctx.beginPath();
-    //   this.ctx.moveTo(cX, cY);
-    //   for (let i=1;i<path.length;i++) {
-    //     const { cX, cY } = this.convertRowColToXY(path[i].getRow(), path[i].getCol());
-    //     this.ctx.lineTo(cX, cY);
-    //   }
-    //   this.ctx.strokeStyle = "red";
-    //   this.ctx.stroke();
-    // }
+    this.ctx.lineWidth = 3;
+    if (path.length > 0) {
+      const { cX, cY } = this.convertRowColToXY(path[0].getRow(), path[0].getCol());
+      this.ctx.beginPath();
+      this.ctx.moveTo(cX, cY);
+      for (let i=1;i<path.length;i++) {
+        const { cX, cY } = this.convertRowColToXY(path[i].getRow(), path[i].getCol());
+        this.ctx.lineTo(cX, cY);
+      }
+      this.ctx.strokeStyle = "rgba(0,150,0)";
+      this.ctx.stroke();
+    }
+    this.ctx.lineWidth = 1;
   }
 
   drawGrid() {
@@ -121,21 +117,29 @@ class Drawing {
       this.ctx.lineWidth = FadingWall.lineWidth;
       this.ctx.strokeStyle = "rgba(0, 255, 0)";
       this.simulation.getFadingWalls().forEach(fadingWall => {
-        this.ctx.globalAlpha = fadingWall.getOpacity() / FadingWall.maxOpacity;
+        const { x1, y1, x2, y2, x3, y3, x4, y4 } = fadingWall.getDimensions();
         this.ctx.beginPath();
-        const { x1, y1, x2, y2 } = fadingWall.getDimensions();
         this.ctx.moveTo(x1, y1);
         this.ctx.lineTo(x2, y2);
         this.ctx.stroke();
+        this.ctx.stroke();
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(x3, y3);
+        this.ctx.lineTo(x4, y4);
+        this.ctx.stroke();
+        this.ctx.stroke();
       });
     }
-    this.ctx.globalAlpha = 1;
   }
 
   draw = () => {
+    if (this.canvas.width !== this.canvas.offsetWidth || this.canvas.height !== this.canvas.offsetHeight) {
+      this.canvas.width = this.canvas.offsetWidth;
+      this.canvas.height = this.canvas.offsetHeight;
+      this.simulation.initialize();
+    }
     this.ctx.fillStyle = "black";
-    this.canvas.width = this.canvas.offsetWidth;
-    this.canvas.height = this.canvas.offsetHeight;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

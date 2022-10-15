@@ -30,20 +30,17 @@ const useEvents = (
 
     const drawing = new Drawing(canvas, simulation, drawFadingCells, drawFadingWalls, showDijkstraAlgo, dijkstraDiplay);
 
-    const drawingInterval = setInterval(drawing.draw, 50);
+    const drawingInterval = setInterval(drawing.draw, 0);
     const updateInterval = setInterval(simulation.update, 10);
     
     startButton.onclick = simulation.initialize;
     mazeType.onchange = simulation.initialize;
-
-    window.addEventListener('resize', simulation.initialize);
 
     setTimeout(simulation.initialize, 100);
 
     return () => {
       clearInterval(drawingInterval);
       clearInterval(updateInterval);
-      window.removeEventListener('resize', simulation.update);
     }
   }, [
     canvasRef, startButtonRef, mazeTypeRef, drawFadingCellsRef,
