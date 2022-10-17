@@ -9,6 +9,7 @@
   --container-padding: 10px;
   --dark-color: #363636;
   --light-color: #dedede;
+  --error-color: rgba(240, 128, 128);
   --opacity: .94;
   --topNavHeight: 75px;
   --inputPadding: 5px;
@@ -154,4 +155,14 @@ html {
   .topNavigationSidebar {
     display: none;
   }
+}
+
+.home-link__email {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.home-link__email > * {
+  margin-right: var(--container-padding);
 }
