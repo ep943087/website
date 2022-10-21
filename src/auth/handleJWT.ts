@@ -1,4 +1,4 @@
-import { LoginResponse } from "../pages/LoginPage";
+import { LoginResponse } from "../pages/LoginPage/LoginPage";
 import { Claim } from "./types";
 
 const tokenKey = 'token';

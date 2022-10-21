@@ -1,12 +1,13 @@
-import Typography from "../utils/Typography";
+import Typography from "../../utils/Typography";
 import styled from 'styled-components';
-import PageAndSideNav from "../Layout/PageAndSideNav";
-import Skill, { SkillProps } from "../utils/Skill";
-import { SideBarLinkProps } from "../utils/SideBarLink";
+import PageAndSideNav from "../../Layout/PageAndSideNav";
+import Skill, { SkillProps } from "../../utils/Skill";
+import { SideBarLinkProps } from "../../utils/SideBarLink";
 import React, { createRef } from "react";
-import PaycomSVG from "../utils/svg/PaycomSVG";
-import CameronSVG from "../utils/svg/CameronSVG";
-import { frameworkSkills, languageSkills, toolSkills } from "../config/skills";
+import PaycomSVG from "../../utils/svg/PaycomSVG";
+import CameronSVG from "../../utils/svg/CameronSVG";
+import { frameworkSkills, languageSkills, toolSkills } from "../../config/skills";
+import ParticalImage from "./ParticalImage/ParticleImage";
 
 const SkillsContainer = styled.div`
   display: flex;
@@ -35,8 +36,9 @@ const ImageAndTextContainer = styled.div`
   span {
     width: 100%;
   }
-  img {
-    max-width: 300px;
+  canvas {
+    width: 300px;
+    height: 300px;
     border-radius: 5px;
   }
 
@@ -123,7 +125,7 @@ const LandingPage = () => {
       <div ref={aboutRef} className="scrollToDiv" />
       <Typography variant="title" textAlign="center">About Elias Proctor</Typography>
       <ImageAndTextContainer>
-        <img src="/portrait.jpg" alt="Portrait" />
+        <ParticalImage />
         <div className="center">
           <Typography variant="body" textAlign="left">
             Hello, my name is Elias Proctor. I fell in love with programming in college, and the love hasn't stopped

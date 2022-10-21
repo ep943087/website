@@ -1,9 +1,9 @@
-import { ProjectType, simulationProjects, mathProjects, gameProjects } from '../config/projects';
+import { ProjectType, simulationProjects, mathProjects, gameProjects } from '../../config/projects';
 import styled from 'styled-components';
-import Typography from '../utils/Typography';
-import PageAndSideNav from '../Layout/PageAndSideNav';
+import Typography from '../../utils/Typography';
+import PageAndSideNav from '../../Layout/PageAndSideNav';
 import { createRef } from 'react';
-import { SideBarLinkProps } from '../utils/SideBarLink';
+import { SideBarLinkProps } from '../../utils/SideBarLink';
 import { Link } from 'react-router-dom';
 
 const ProjectsContainer = styled.div`

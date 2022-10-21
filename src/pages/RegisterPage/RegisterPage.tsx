@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Form from "../forms/Form";
-import TextField from "../forms/TextField";
-import Page from "../Layout/Page";
-import { convertErrorResponseToArray, post } from "../Requests/Requests";
-import Typography from "../utils/Typography";
+import Form from "../../forms/Form";
+import TextField from "../../forms/TextField";
+import Page from "../../Layout/Page";
+import { convertErrorResponseToArray, post } from "../../Requests/Requests";
+import Typography from "../../utils/Typography";
 
 interface RegisterState {
   Email: string,

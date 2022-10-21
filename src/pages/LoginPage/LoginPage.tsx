@@ -1,12 +1,12 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { getClaims, saveToken } from "../auth/handleJWT";
-import Form from "../forms/Form";
-import TextField from "../forms/TextField";
-import Page from "../Layout/Page";
-import { convertErrorResponseToArray, post } from "../Requests/Requests";
-import Typography from "../utils/Typography";
-import GlobalContext from '../context/Global/GlobalContext';
+import { getClaims, saveToken } from "../../auth/handleJWT";
+import Form from "../../forms/Form";
+import TextField from "../../forms/TextField";
+import Page from "../../Layout/Page";
+import { convertErrorResponseToArray, post } from "../../Requests/Requests";
+import Typography from "../../utils/Typography";
+import GlobalContext from '../../context/Global/GlobalContext';
 
 interface LoginState {
   Email: string,

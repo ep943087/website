@@ -1,7 +1,7 @@
-import LandingPage from "../pages/LandingPage";
-import LoginPage from "../pages/LoginPage";
-import ProjectsPage from "../pages/ProjectsPage";
-import RegisterPage from "../pages/RegisterPage";
+import LandingPage from "../pages/LandingPage/LandingPage";
+import LoginPage from "../pages/LoginPage/LoginPage";
+import ProjectsPage from "../pages/ProjectsPage/ProjectsPage";
+import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import MazeGeneration from "../projects/MazeGeneration/MazeGeneration";
 import SnakeGamePathFinding from "../projects/SnakeGamePathFinding/SnakeGamePathFinding";
 
