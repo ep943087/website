@@ -71,6 +71,9 @@ class Simulation {
       case MazeType.RecursiveBackTracking:
         this.initializeRecursiveBackTracking();
         break;
+      case MazeType.Prim:
+        this.initializePrim();
+        break;
     }
   }
 
@@ -100,6 +103,11 @@ class Simulation {
 
   initializeRecursiveBackTracking() {
     this.backTrackingStack = [this.currentCell as Cell];
+    this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
+  }
+
+  initializePrim() {
+    this.currentCell = this.grid.getMatrix()[~~(Math.random()*this.grid.getRows())][~~(Math.random()*this.grid.getCols())];
     this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
   }
 
@@ -257,6 +265,9 @@ class Simulation {
       case MazeType.RecursiveBackTracking:
         this.updateRecursiveBackTracking();
         break;
+      case MazeType.Prim:
+        this.updatePrim();
+        break;
     }
 
     return this.generatingMaze;
@@ -269,20 +280,20 @@ class Simulation {
     }
 
     if (this.currentCell !== undefined) {
-      if (this.currentCell.upLinkExists() && this.currentCell.rightLinkExists()) {
+      if (this.currentCell.upNeighborExists() && this.currentCell.rightNeighborExists()) {
         if (Math.random() < .5) {
           this.unlinkCell(this.currentCell, DirectionType.Right);
         } else {
           this.unlinkCell(this.currentCell, DirectionType.Up);
         }
-      } else if (this.currentCell.rightLinkExists()) {
+      } else if (this.currentCell.rightNeighborExists()) {
         this.unlinkCell(this.currentCell, DirectionType.Right);
       } else {
         this.unlinkCell(this.currentCell, DirectionType.Up);
       }
-      if (!this.directionIsLeft && this.currentCell.rightLinkExists()) {
+      if (!this.directionIsLeft && this.currentCell.rightNeighborExists()) {
         this.currentCell = this.currentCell.getRightNeighbor() ?? new Cell(0, 0);
-      } else if (this.directionIsLeft && this.currentCell.leftLinkExists()) {
+      } else if (this.directionIsLeft && this.currentCell.leftNeighborExists()) {
         this.currentCell = this.currentCell.getLeftNeighbor() ?? new Cell(0, 0);
       } else {
         this.directionIsLeft = !this.directionIsLeft;
@@ -307,7 +318,7 @@ class Simulation {
     this.sideWinderCellList.push(this.currentCell);
     if (this.currentCell.getRow() === 0) {
       this.unlinkCell(this.currentCell, DirectionType.Right);
-      if (this.currentCell.rightLinkExists()) {
+      if (this.currentCell.rightNeighborExists()) {
         this.currentCell = this.currentCell.getRightNeighbor();
       } else if (this.currentCell.getRow() + 1 < this.grid.getRows()) {
         this.sideWinderCellList = [];
@@ -318,7 +329,7 @@ class Simulation {
     } else if (Math.random() < .5 || !this.currentCell.getRightNeighbor()) {
       this.unlinkCell(this.randomSideWinderCell(), DirectionType.Up);
       this.sideWinderCellList = [];
-      if (this.currentCell.rightLinkExists()) {
+      if (this.currentCell.rightNeighborExists()) {
         this.currentCell = this.currentCell.getRightNeighbor();
       } else if (this.currentCell.getRow() + 1 < this.grid.getRows()) {
         this.currentCell = this.grid.getMatrix()[this.currentCell.getRow() + 1][0];
@@ -327,7 +338,7 @@ class Simulation {
       }
     } else {
       this.unlinkCell(this.currentCell, DirectionType.Right);
-      if (this.currentCell.rightLinkExists()) {
+      if (this.currentCell.rightNeighborExists()) {
         this.currentCell = this.currentCell.getRightNeighbor();
       } else if (this.currentCell.getRow() + 1 < this.grid.getRows()) {
         this.currentCell = this.grid.getMatrix()[this.currentCell.getRow() + 1][0];
@@ -487,6 +498,48 @@ class Simulation {
     } else {
       this.generatingMaze = false;
     }
+
+    return this.generatingMaze;
+  }
+
+  updatePrim() {
+    if (!this.generatingMaze) {
+      return false;
+    }
+
+    if (this.unvisitedCells.length === 0) {
+      this.generatingMaze = false;
+      return this.generatingMaze;
+    }
+
+    const visitedCells = this.grid.getMatrix().flat().filter(cell => !this.unvisitedCells.includes(cell));
+
+    const neighborsNextToUnvisited = visitedCells.filter(cell => {
+      return cell.getNeighbors().filter(neighbor => (
+        this.unvisitedCells.includes(neighbor)
+      )).length > 0;
+    });
+
+    this.currentCell = neighborsNextToUnvisited[Math.floor(Math.random() * neighborsNextToUnvisited.length)];
+
+    const unvisitedNeighbors = this.currentCell.getNeighbors().filter(neighbor => (
+      this.unvisitedCells.includes(neighbor)
+    ));
+
+    const next = unvisitedNeighbors[Math.floor(Math.random() * unvisitedNeighbors.length)];
+
+    if (this.currentCell?.getUpNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Up);
+    } else if (this.currentCell?.getDownNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Down);
+    } else if (this.currentCell?.getLeftNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Left);
+    } else if (this.currentCell?.getRightNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Right);
+    }
+
+    this.currentCell = next;
+    this.unvisitedCells = this.unvisitedCells.filter(cell => cell !== next);
 
     return this.generatingMaze;
   }

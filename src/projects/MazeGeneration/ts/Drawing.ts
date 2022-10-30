@@ -65,6 +65,34 @@ class Drawing {
         this.ctx.fillRect(x, y, cellLength, cellLength);
       });
 
+      this.ctx.lineWidth = 3;
+      const deadEnds: { x: number, y: number}[] = [];
+      this.ctx.strokeStyle = "#FF0000";
+      matrix.flat().forEach((cell) => {
+        if (this.dijkstraDiplay.value === DijkstraDisplayType.spanningTree) {
+          const neighbors = cell.getSpanningTreeNeighbors();
+          const { cX, cY } = this.convertRowColToXY(cell.getRow(), cell.getCol());
+          neighbors.forEach((neighbor) => {
+            const { cX: ncX, cY: ncY } = this.convertRowColToXY(neighbor.getRow(), neighbor.getCol());
+            this.ctx.beginPath();
+            this.ctx.moveTo(cX, cY);
+            this.ctx.lineTo(ncX, ncY);
+            this.ctx.stroke();
+          });
+          if (neighbors.length === 1) {
+            deadEnds.push({ x: cX, y: cY });
+          }
+        }
+      });
+
+      this.ctx.fillStyle = "#FFFF00";
+      deadEnds.forEach((cell) => {
+          this.ctx.lineWidth = 1;
+          this.ctx.beginPath();
+          this.ctx.arc(cell.x, cell.y, 3, 0, 2*Math.PI);
+          this.ctx.fill();
+      });
+
       if (this.dijkstraDiplay.value === DijkstraDisplayType.cornerToCornerPath) {
         this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[rows-1][cols-1]);
       } else if (this.dijkstraDiplay.value === DijkstraDisplayType.pathToMaxDistance) {
@@ -84,6 +112,9 @@ class Drawing {
     this.ctx.lineWidth = 1;
     for (let i=0;i<rows;i++) {
       for (let j=0;j<cols;j++) {
+        if (this.simulation.getIsMazeComplete() && this.showDijkstraAlgo.checked && this.dijkstraDiplay.value === DijkstraDisplayType.spanningTree) {
+          this.ctx.lineWidth = .2;
+        }
         const cell = matrix[i][j];
         const { x, y } = this.convertRowColToXY(cell.getRow(), cell.getCol());
         if (cell.isUpLink()) {

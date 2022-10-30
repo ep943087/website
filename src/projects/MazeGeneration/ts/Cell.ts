@@ -49,10 +49,10 @@ class Cell {
   isLeftLink() { return this.left.link; }
   isRightLink() { return this.right.link; }
 
-  upLinkExists() { return Boolean(this.up.cell); }
-  downLinkExists() { return Boolean(this.down.cell); }
-  leftLinkExists() { return Boolean(this.left.cell); }
-  rightLinkExists() { return Boolean(this.right.cell); }
+  upNeighborExists() { return Boolean(this.up.cell); }
+  downNeighborExists() { return Boolean(this.down.cell); }
+  leftNeighborExists() { return Boolean(this.left.cell); }
+  rightNeighborExists() { return Boolean(this.right.cell); }
 
   getUpNeighbor() { return this.up.cell }
   getDownNeighbor() { return this.down.cell }
@@ -99,6 +99,15 @@ class Cell {
   getRandomNeighbor(): Cell {
     const neighbors: Cell[] = this.getNeighbors();
     return neighbors[Math.floor(Math.random()*neighbors.length)];
+  }
+
+  getSpanningTreeNeighbors(): Cell[] {
+    return [
+      this.isDownLink() ? undefined : this.down.cell,
+      this.isUpLink() ? undefined : this.up.cell,
+      this.isLeftLink() ? undefined : this.left.cell,
+      this.isRightLink() ? undefined : this.right.cell,
+    ].filter(cell => cell !== undefined) as Cell[];
   }
 }
 

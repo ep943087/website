@@ -1,5 +1,5 @@
 class ImageParticle {
-  private velocity: number = 2;
+  private velocity: number = 1;
   constructor(
     private targetX: number,
     private targetY: number,
