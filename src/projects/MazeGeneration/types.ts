@@ -9,6 +9,7 @@ export enum MazeType {
   RecursiveBackTracking = '5',
   Prim = '6',
   Kruskal = '7',
+  GrowingTree = '8',
 };
 
 export enum DijkstraDisplayType {
@@ -27,6 +28,7 @@ export const mazeTypes: OptionType[] = [
   { value: MazeType.RecursiveBackTracking, label: 'Recursive Back-Tracking' },
   { value: MazeType.Prim, label: 'Prim\'s' },
   { value: MazeType.Kruskal, label: 'Kruskal\'s' },
+  { value: MazeType.GrowingTree, label: 'Growing Tree' },
 ];
 
 export const dijkstraDisplayTypes: OptionType[] = [

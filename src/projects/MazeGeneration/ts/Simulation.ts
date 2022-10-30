@@ -22,6 +22,8 @@ class Simulation {
   private backTrackingStack: Cell[] = [];
   private sets: Cell[][] = [];
   private weights: { left: Cell, right: Cell }[] = [];
+  private activeList: Cell[] = [];
+  private growingTreeTarget: Cell = new Cell(0, 0);
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
@@ -82,6 +84,9 @@ class Simulation {
         break;
       case MazeType.Kruskal:
         this.initializeKruskal();
+        break;
+      case MazeType.GrowingTree:
+        this.initializeGrowingTree();
         break;
     }
   }
@@ -148,6 +153,13 @@ class Simulation {
         }
       });
     });
+  }
+
+  initializeGrowingTree() {
+    this.setCurrentToRandomCell();
+    this.activeList = [this.currentCell as Cell];
+    this.growingTreeTarget = this.grid.getMatrix()[this.grid.getRows()-1][this.grid.getCols()-1];
+    this.unvisitedCells = this.grid.getMatrix().flat();
   }
 
   convertRowColToXY(row: number, col: number) {
@@ -309,6 +321,9 @@ class Simulation {
         break;
       case MazeType.Kruskal:
         this.updateKruskal();
+        break;
+      case MazeType.GrowingTree:
+        this.updateGrowingTree();
         break;
     }
 
@@ -575,6 +590,35 @@ class Simulation {
       ...setWithLeft,
       ...setWithRight,
     ]);
+
+    return this.generatingMaze;
+  }
+
+  updateGrowingTree() {
+    if (!this.generatingMaze) {
+      return false;
+    }
+
+    if (this.activeList.length === 0) {
+      this.generatingMaze = false;
+      return this.generatingMaze;
+    }
+
+    this.currentCell = Math.random() > .5 ? this.activeList[this.activeList.length - 1] :
+      this.activeList[~~(Math.random() * this.activeList.length)];
+
+    const unvisitedNeighbors = this.currentCell.getNeighbors().filter(neighbor => (
+      this.unvisitedCells.includes(neighbor)
+    )) ?? [];
+
+    if (unvisitedNeighbors.length > 0) {
+      const neighbor = unvisitedNeighbors[~~(Math.random()*unvisitedNeighbors.length)]
+      this.removeCellFromUnvisitedCells(neighbor);
+      this.unlinkNext(neighbor);
+      this.activeList.push(neighbor);
+    } else {
+      this.activeList = this.activeList.filter(cell => cell !== this.currentCell);
+    }
 
     return this.generatingMaze;
   }
