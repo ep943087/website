@@ -1,4 +1,5 @@
-import { DijkstraDisplayType } from "../types";
+import { DijkstraDisplayType, MazeType } from "../types";
+import Cell from "./Cell";
 import DijkstraCell from "./DijkstraCell";
 import FadingCell from "./FadingCell";
 import FadingWall from "./FadingWall";
@@ -100,6 +101,40 @@ class Drawing {
         this.ctx.arc(cell.x, cell.y, 3, 0, 2*Math.PI);
         this.ctx.fill();
     });
+
+    if (this.simulation.getIsGeneratingMaze() && this.simulation.getMazeType() === MazeType.Wilson) {
+      this.ctx.fillStyle = "#FFFF00";
+      if (rows * cols === this.simulation.getUnvisitedCells().length + 1) {
+        const visitedCell = matrix.flat().find(cell => !this.simulation.getUnvisitedCells().includes(cell)) as Cell;
+        const { cX, cY } = this.convertRowColToXY(visitedCell.getRow(), visitedCell.getCol());
+        this.ctx.beginPath();
+        this.ctx.arc(cX, cY, 3, 0, 2*Math.PI);
+        this.ctx.fill();
+      }
+
+      this.ctx.lineWidth = 3;
+      this.ctx.strokeStyle = "#00FFFF";
+      const wilsonPath = this.simulation.getWilsonPath();
+      if (wilsonPath.length > 1) {
+        this.ctx.beginPath();
+        const { cX, cY } = this.convertRowColToXY(wilsonPath[0].getRow(), wilsonPath[1].getCol());
+        this.ctx.moveTo(cX, cY);
+        for (let i=1;i<wilsonPath.length;i++) {
+          const { cX, cY } = this.convertRowColToXY(wilsonPath[i].getRow(), wilsonPath[i].getCol());
+          this.ctx.lineTo(cX, cY);
+        }
+        this.ctx.stroke();
+        
+        this.ctx.beginPath();
+        this.ctx.arc(cX, cY, 3, 0, 2*Math.PI);
+        this.ctx.fill();
+
+        const { cX: lcX, cY: lcY } = this.convertRowColToXY(wilsonPath[wilsonPath.length - 1].getRow(), wilsonPath[wilsonPath.length - 1].getCol());
+        this.ctx.beginPath();
+        this.ctx.arc(lcX, lcY, 3, 0, 2*Math.PI);
+        this.ctx.fill();
+      }
+    }
 
     if (this.drawFadingCells.checked) {
       this.simulation.getFadingCells().forEach(cell => {

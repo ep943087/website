@@ -34,6 +34,10 @@ class Simulation {
   getDijkstraGrid() {return this.dijkstraGrid; }
   getCellLength() { return this.cellLength; }
   getIsMazeComplete() { return this.isMazeComplete; }
+  getIsGeneratingMaze() { return this.generatingMaze; }
+  getMazeType() { return this.mazeType.value; }
+  getWilsonPath() { return this.wilsonPath; }
+  getUnvisitedCells() { return this.unvisitedCells; }
   getDimensions() {
     return {
       rows: this.grid.getRows(), cols: this.grid.getCols(), cellLength: this.cellLength,
@@ -43,8 +47,8 @@ class Simulation {
   initialize = () => {
     this.canvas.width = this.canvas.offsetWidth;
     this.canvas.height = this.canvas.offsetHeight;
-    const cols = Math.floor(this.canvas.width / this.cellLength)
-    const rows = Math.floor(this.canvas.height / this.cellLength);
+    const cols = ~~(this.canvas.width / this.cellLength)
+    const rows = ~~(this.canvas.height / this.cellLength);
     this.grid = new Grid(rows, cols);
     this.grid.initialize();
     this.currentCell = this.grid.getMatrix()[0][0];
@@ -102,7 +106,7 @@ class Simulation {
   initializeWilsonAlgorithm() {
     this.setCurrentToRandomCell();
     this.unvisitedCells = this.grid.getMatrix().flat().filter(
-      cell => cell !== this.grid.getMatrix()[Math.floor(this.grid.getRows()/2)][Math.floor(this.grid.getCols()/2)]
+      cell => cell !== this.grid.getMatrix()[~~(this.grid.getRows()/2)][~~(this.grid.getCols()/2)]
     );
     this.wilsonPath = [];
   }
@@ -226,7 +230,7 @@ class Simulation {
   };
 
   performDijkstraAlgorithm() {
-    const startCell: DijkstraCell = this.dijkstraGrid[Math.floor(this.grid.getRows()-1)][Math.floor(0)];
+    const startCell: DijkstraCell = this.dijkstraGrid[~~(this.grid.getRows()-1)][0];
     startCell.setDistance(0);
 
     const openList: DijkstraCell[] = this.dijkstraGrid.flat();
@@ -344,7 +348,7 @@ class Simulation {
   }
 
   randomSideWinderCell(): Cell {
-    return this.sideWinderCellList[Math.floor(Math.random() * this.sideWinderCellList.length)];
+    return this.sideWinderCellList[~~(Math.random() * this.sideWinderCellList.length)];
   }
 
   updateSideWinderAlgorithm() {
@@ -394,18 +398,9 @@ class Simulation {
     }
 
     const neighbors = this.currentCell.getNeighbors();
-    const neighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+    const neighbor = neighbors[~~(Math.random() * neighbors.length)];
     if (this.unvisitedCells.includes(neighbor)) {
-      if (neighbor === this.currentCell.getUpNeighbor()) {
-        this.unlinkCell(this.currentCell, DirectionType.Up);
-      } else if (neighbor === this.currentCell.getDownNeighbor()) {
-        this.unlinkCell(this.currentCell, DirectionType.Down);
-      } else if (neighbor === this.currentCell.getLeftNeighbor()) {
-        this.unlinkCell(this.currentCell, DirectionType.Left);
-      } else if (neighbor === this.currentCell.getRightNeighbor()) {
-        this.unlinkCell(this.currentCell, DirectionType.Right);
-      }
-
+      this.unlinkNext(neighbor);
       this.removeCellFromUnvisitedCells(neighbor);
     }
     this.currentCell = neighbor;
@@ -431,20 +426,13 @@ class Simulation {
       for (let i=0;i<this.wilsonPath.length-1;i++) {
         const first = this.wilsonPath[i];
         const second = this.wilsonPath[i+1];
-        if (first.getUpNeighbor() === second) {
-          this.unlinkCell(first, DirectionType.Up);
-        } else if (first.getDownNeighbor() === second) {
-          this.unlinkCell(first, DirectionType.Down);
-        } else if (first.getLeftNeighbor() === second) {
-          this.unlinkCell(first, DirectionType.Left);
-        } else if (first.getRightNeighbor() === second) {
-          this.unlinkCell(first, DirectionType.Right);
-        }
+        this.currentCell = first;
+        this.unlinkNext(second);
       }
 
       this.unvisitedCells = this.unvisitedCells.filter(cell => !this.wilsonPath.includes(cell));
       this.wilsonPath = [];
-      this.currentCell = this.unvisitedCells[Math.floor(Math.random()*this.unvisitedCells.length)];
+      this.currentCell = this.unvisitedCells[~~(Math.random()*this.unvisitedCells.length)];
     } else {
       this.currentCell = next;
     }
@@ -464,16 +452,8 @@ class Simulation {
         this.addToFadingCells(this.currentCell);
         const neighbors = this.currentCell.getNeighbors().filter(neighbor => !this.unvisitedCells.includes(neighbor));
         if (this.unvisitedCells.includes(this.currentCell) && neighbors.length > 0) {
-          const neighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
-          if (this.currentCell.getUpNeighbor() === neighbor) {
-            this.unlinkCell(this.currentCell, DirectionType.Up);
-          } else if (this.currentCell.getDownNeighbor() === neighbor) {
-            this.unlinkCell(this.currentCell, DirectionType.Down);
-          } else if (this.currentCell.getLeftNeighbor() === neighbor) {
-            this.unlinkCell(this.currentCell, DirectionType.Left);
-          } else if (this.currentCell.getRightNeighbor() === neighbor) {
-            this.unlinkCell(this.currentCell, DirectionType.Right);
-          }
+          const neighbor = neighbors[~~(Math.random()*neighbors.length)];
+          this.unlinkNext(neighbor);
           this.removeCellFromUnvisitedCells(this.currentCell);
           this.hunting = false;
           break;
@@ -491,16 +471,8 @@ class Simulation {
         this.hunting = true;
         this.currentCell = this.grid.getMatrix()[0][0];
       } else {
-        const next = neighbors[Math.floor(Math.random()*neighbors.length)];
-        if (this.currentCell.getUpNeighbor() === next) {
-          this.unlinkCell(this.currentCell, DirectionType.Up);
-        } else if (this.currentCell.getDownNeighbor() === next) {
-          this.unlinkCell(this.currentCell, DirectionType.Down);
-        } else if (this.currentCell.getLeftNeighbor() === next) {
-          this.unlinkCell(this.currentCell, DirectionType.Left);
-        } else if (this.currentCell.getRightNeighbor() === next) {
-          this.unlinkCell(this.currentCell, DirectionType.Right);
-        }
+        const next = neighbors[~~(Math.random()*neighbors.length)];
+        this.unlinkNext(next);
         this.removeCellFromUnvisitedCells(next);
         this.currentCell = next;
       }
@@ -518,16 +490,8 @@ class Simulation {
     const neighbors = this.currentCell.getNeighbors().filter(cell => this.unvisitedCells.includes(cell));
 
     if (neighbors.length > 0) {
-      const neighbor = neighbors[Math.floor(Math.random()*neighbors.length)];
-      if (this.currentCell.getUpNeighbor() === neighbor) {
-        this.unlinkCell(this.currentCell, DirectionType.Up);
-      } else if (this.currentCell.getDownNeighbor() === neighbor) {
-        this.unlinkCell(this.currentCell, DirectionType.Down);
-      } else if (this.currentCell.getLeftNeighbor() === neighbor) {
-        this.unlinkCell(this.currentCell, DirectionType.Left);
-      } else if (this.currentCell.getRightNeighbor() === neighbor) {
-        this.unlinkCell(this.currentCell, DirectionType.Right);
-      }
+      const neighbor = neighbors[~~(Math.random()*neighbors.length)];
+      this.unlinkNext(neighbor);
       this.currentCell = neighbor;
       this.removeCellFromUnvisitedCells(neighbor);
       this.backTrackingStack.push(this.currentCell);
@@ -558,23 +522,15 @@ class Simulation {
       )).length > 0;
     });
 
-    this.currentCell = neighborsNextToUnvisited[Math.floor(Math.random() * neighborsNextToUnvisited.length)];
+    this.currentCell = neighborsNextToUnvisited[~~(Math.random() * neighborsNextToUnvisited.length)];
 
     const unvisitedNeighbors = this.currentCell.getNeighbors().filter(neighbor => (
       this.unvisitedCells.includes(neighbor)
     ));
 
-    const next = unvisitedNeighbors[Math.floor(Math.random() * unvisitedNeighbors.length)];
+    const next = unvisitedNeighbors[~~(Math.random() * unvisitedNeighbors.length)];
 
-    if (this.currentCell?.getUpNeighbor() === next) {
-      this.unlinkCell(this.currentCell, DirectionType.Up);
-    } else if (this.currentCell?.getDownNeighbor() === next) {
-      this.unlinkCell(this.currentCell, DirectionType.Down);
-    } else if (this.currentCell?.getLeftNeighbor() === next) {
-      this.unlinkCell(this.currentCell, DirectionType.Left);
-    } else if (this.currentCell?.getRightNeighbor() === next) {
-      this.unlinkCell(this.currentCell, DirectionType.Right);
-    }
+    this.unlinkNext(next);
 
     this.currentCell = next;
     this.removeCellFromUnvisitedCells(next);
@@ -607,15 +563,7 @@ class Simulation {
 
     this.currentCell = weight.left;
 
-    if (this.currentCell.getUpNeighbor() === weight.right) {
-      this.unlinkCell(this.currentCell, DirectionType.Up);
-    } else if (this.currentCell.getDownNeighbor() === weight.right) {
-      this.unlinkCell(this.currentCell, DirectionType.Down);
-    } else if (this.currentCell.getLeftNeighbor() === weight.right) {
-      this.unlinkCell(this.currentCell, DirectionType.Left);
-    } else if (this.currentCell.getRightNeighbor() === weight.right) {
-      this.unlinkCell(this.currentCell, DirectionType.Right);
-    }
+    this.unlinkNext(weight.right);
 
     this.sets.splice(setWithLeftIndex, 1);
 
@@ -633,6 +581,18 @@ class Simulation {
 
   getVisitedCells() {
     return this.grid.getMatrix().flat().filter(cell => !this.unvisitedCells.includes(cell));
+  }
+
+  unlinkNext(next: Cell) {
+    if (this.currentCell?.getUpNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Up);
+    } else if (this.currentCell?.getDownNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Down);
+    } else if (this.currentCell?.getLeftNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Left);
+    } else if (this.currentCell?.getRightNeighbor() === next) {
+      this.unlinkCell(this.currentCell, DirectionType.Right);
+    }
   }
 
   removeCellFromUnvisitedCells(removeCell: Cell) {
