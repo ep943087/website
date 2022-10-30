@@ -21,9 +21,10 @@ class Simulation {
   private hunting: boolean = false;
   private backTrackingStack: Cell[] = [];
   private sets: Cell[][] = [];
+  private previousEllerSet: Cell[][] = [];
   private weights: { left: Cell, right: Cell }[] = [];
   private activeList: Cell[] = [];
-  private growingTreeTarget: Cell = new Cell(0, 0);
+  private currentRow: number = 0;
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
@@ -87,6 +88,9 @@ class Simulation {
         break;
       case MazeType.GrowingTree:
         this.initializeGrowingTree();
+        break;
+      case MazeType.Eller:
+        this.initalizeEller();
         break;
     }
   }
@@ -158,8 +162,28 @@ class Simulation {
   initializeGrowingTree() {
     this.setCurrentToRandomCell();
     this.activeList = [this.currentCell as Cell];
-    this.growingTreeTarget = this.grid.getMatrix()[this.grid.getRows()-1][this.grid.getCols()-1];
     this.unvisitedCells = this.grid.getMatrix().flat();
+  }
+
+  initalizeEller() {
+    this.currentRow = 0;
+    this.previousEllerSet = [];
+    this.generateEllerSetsAndWeights();
+  }
+
+  generateEllerSetsAndWeights() {
+    const row = this.currentRow;
+    if (row >= this.grid.getRows()) {
+      return;
+    }
+    this.sets = [];
+    this.weights = [];
+    for (let i=0;i<this.grid.getCols()-1;i++) {
+      this.weights.push({
+        left: this.grid.getMatrix()[row][i],
+        right: this.grid.getMatrix()[row][i+1],
+      })
+    }
   }
 
   convertRowColToXY(row: number, col: number) {
@@ -324,6 +348,9 @@ class Simulation {
         break;
       case MazeType.GrowingTree:
         this.updateGrowingTree();
+        break;
+      case MazeType.Eller:
+        this.updateEller();
         break;
     }
 
@@ -621,6 +648,89 @@ class Simulation {
     }
 
     return this.generatingMaze;
+  }
+
+  updateEller() {
+    if (!this.generatingMaze) {
+      return false;
+    }
+
+    const row = this.currentRow;
+
+    if (row === this.grid.getRows()) {
+      this.generatingMaze = false;
+      return false;
+    }
+
+    if (this.weights.length > 0 && row < this.grid.getRows() - 1) {
+      const weight = this.weights[~~(Math.random()*this.weights.length)];
+      this.weights = this.weights.filter(w => w !== weight);
+      const leftSet = this.sets.find(set => set.includes(weight.left));
+      const rightSet = this.sets.find(set => set.includes(weight.right));
+
+      if (!leftSet || !rightSet) {
+        this.currentCell = weight.left;
+        this.unlinkNext(weight.right);
+      }
+      if (!leftSet) {
+        if (!rightSet) {
+          this.sets.push([weight.left, weight.right]);
+        } else {
+          rightSet.push(weight.left);
+        }
+      } else if (!rightSet) {
+        if (!leftSet) {
+          this.sets.push([weight.left, weight.right]);
+        } else {
+          leftSet.push(weight.right);
+        }
+      }
+      this.previousEllerSet = [...this.sets];
+    } else if (this.sets.length > 0 && row < this.grid.getRows() - 1) {
+      const set = this.sets.pop() ?? [];
+      this.currentCell = set[~~(Math.random()*set.length)];
+      const next = this.grid.getMatrix()[row+1][this.currentCell.getCol()];
+      this.unlinkNext(next);
+      set.push(next);
+    } else if (this.weights.length > 0 && row === this.grid.getRows() - 1) {
+      const weight = this.weights[~~(Math.random()*this.weights.length)];
+      this.weights = this.weights.filter(w => w !== weight);
+
+      this.generateSets();
+      const leftSet = this.sets.find(set => set.includes(weight.left));
+
+      if (!leftSet?.includes(weight.right)) {
+        this.currentCell = weight.left;
+        this.unlinkNext(weight.right);
+      }
+    } else {
+      this.currentRow++;
+      this.generateEllerSetsAndWeights();
+    }
+
+    return this.generatingMaze;
+  }
+
+  generateSets() {
+    const cells = this.grid.getMatrix().flat();
+    this.sets = cells.map(cell => [cell]);
+    cells.forEach(cell => {
+      const neighbors = cell.getSpanningTreeNeighbors();
+      const cellSet = this.sets.find(set => set.includes(cell)) as Cell[];
+      neighbors.forEach(neighbor => {
+        const neighborSetIndex = this.sets.findIndex(set => set.includes(neighbor));
+        const neighborSet = this.sets[neighborSetIndex];
+
+        if (neighborSet === cellSet) {
+          return;
+        }
+
+        this.sets.splice(neighborSetIndex, 1);
+        neighborSet?.forEach(cell => {
+          cellSet.push(cell);
+        });
+      });
+    });
   }
 
   getVisitedCells() {

@@ -38,6 +38,16 @@ class Drawing {
       }
       this.ctx.strokeStyle = "rgba(0,150,0)";
       this.ctx.stroke();
+
+      this.ctx.fillStyle = "#FFFF00";
+      this.ctx.beginPath();
+      this.ctx.arc(cX, cY, 3, 0, 2*Math.PI);
+      this.ctx.fill();
+
+      const { cX: lcX, cY: lcY } = this.convertRowColToXY(path[path.length-1].getRow(), path[path.length-1].getCol());
+      this.ctx.beginPath();
+      this.ctx.arc(lcX, lcY, 3, 0, 2*Math.PI);
+      this.ctx.fill();
     }
     this.ctx.lineWidth = 1;
   }

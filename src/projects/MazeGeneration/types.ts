@@ -10,6 +10,7 @@ export enum MazeType {
   Prim = '6',
   Kruskal = '7',
   GrowingTree = '8',
+  Eller = '9',
 };
 
 export enum DijkstraDisplayType {
@@ -29,6 +30,7 @@ export const mazeTypes: OptionType[] = [
   { value: MazeType.Prim, label: 'Prim\'s' },
   { value: MazeType.Kruskal, label: 'Kruskal\'s' },
   { value: MazeType.GrowingTree, label: 'Growing Tree' },
+  { value: MazeType.Eller, label: 'Eller\'s' },
 ];
 
 export const dijkstraDisplayTypes: OptionType[] = [
