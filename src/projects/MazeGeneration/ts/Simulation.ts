@@ -20,6 +20,8 @@ class Simulation {
   private wilsonPath: Cell[] = [];
   private hunting: boolean = false;
   private backTrackingStack: Cell[] = [];
+  private sets: Cell[][] = [];
+  private weights: { left: Cell, right: Cell }[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
@@ -74,7 +76,14 @@ class Simulation {
       case MazeType.Prim:
         this.initializePrim();
         break;
+      case MazeType.Kruskal:
+        this.initializeKruskal();
+        break;
     }
+  }
+
+  setCurrentToRandomCell() {
+    this.currentCell = this.grid.getMatrix()[~~(Math.random()*this.grid.getRows())][~~(Math.random()*this.grid.getCols())];
   }
 
   intializeBinarySearchTreeAlgorithm() {
@@ -86,10 +95,12 @@ class Simulation {
   }
 
   intializeAldousBroderAlgorithm() {
+    this.setCurrentToRandomCell();
     this.unvisitedCells = this.grid.getMatrix().flat();
   }
 
   initializeWilsonAlgorithm() {
+    this.setCurrentToRandomCell();
     this.unvisitedCells = this.grid.getMatrix().flat().filter(
       cell => cell !== this.grid.getMatrix()[Math.floor(this.grid.getRows()/2)][Math.floor(this.grid.getCols()/2)]
     );
@@ -97,18 +108,42 @@ class Simulation {
   }
 
   initializeHuntAndKill() {
+    this.setCurrentToRandomCell();
     this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
     this.hunting = false;
   }
 
   initializeRecursiveBackTracking() {
+    this.setCurrentToRandomCell();
     this.backTrackingStack = [this.currentCell as Cell];
     this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
   }
 
   initializePrim() {
-    this.currentCell = this.grid.getMatrix()[~~(Math.random()*this.grid.getRows())][~~(Math.random()*this.grid.getCols())];
+    this.setCurrentToRandomCell();
     this.unvisitedCells = this.grid.getMatrix().flat().filter(cell => cell !== this.currentCell);
+  }
+
+  initializeKruskal() {
+    this.setCurrentToRandomCell();
+    this.sets = this.grid.getMatrix().flat().map(cell => [cell]);
+    this.weights = [];
+
+    const weightExists = (newWeight: { left: Cell, right: Cell }) => (
+      this.weights.some(weight => (
+        (weight.left === newWeight.left && weight.right === newWeight.right) ||
+        (weight.right === newWeight.left && weight.left === newWeight.right)
+      ))
+    );
+
+    this.grid.getMatrix().flat().forEach(cell => {
+      cell.getNeighbors().forEach(neighbor => {
+        const newWeight = { left: cell, right: neighbor };
+        if (!weightExists(newWeight)) {
+          this.weights.push(newWeight);
+        }
+      });
+    });
   }
 
   convertRowColToXY(row: number, col: number) {
@@ -267,6 +302,9 @@ class Simulation {
         break;
       case MazeType.Prim:
         this.updatePrim();
+        break;
+      case MazeType.Kruskal:
+        this.updateKruskal();
         break;
     }
 
@@ -539,9 +577,62 @@ class Simulation {
     }
 
     this.currentCell = next;
-    this.unvisitedCells = this.unvisitedCells.filter(cell => cell !== next);
+    this.removeCellFromUnvisitedCells(next);
 
     return this.generatingMaze;
+  }
+
+  updateKruskal() {
+    if (!this.generatingMaze) {
+      return false;
+    }
+
+    if (this.weights.length === 0) {
+      this.generatingMaze = false;
+      return false;
+    }
+
+    let weight = this.weights[~~(Math.random()*this.weights.length)];
+    let setWithLeftIndex = this.sets.findIndex(set => set.includes(weight.left));
+    let setWithLeft = this.sets[setWithLeftIndex];
+
+    do {
+      weight = this.weights[~~(Math.random()*this.weights.length)];
+      // eslint-disable-next-line no-loop-func
+      this.weights = this.weights.filter(w => w !== weight);
+      // eslint-disable-next-line no-loop-func
+      setWithLeftIndex = this.sets.findIndex(set => set.includes(weight.left));
+      setWithLeft = this.sets[setWithLeftIndex];
+    } while (setWithLeft.includes(weight.right) && this.weights.length > 0);
+
+    this.currentCell = weight.left;
+
+    if (this.currentCell.getUpNeighbor() === weight.right) {
+      this.unlinkCell(this.currentCell, DirectionType.Up);
+    } else if (this.currentCell.getDownNeighbor() === weight.right) {
+      this.unlinkCell(this.currentCell, DirectionType.Down);
+    } else if (this.currentCell.getLeftNeighbor() === weight.right) {
+      this.unlinkCell(this.currentCell, DirectionType.Left);
+    } else if (this.currentCell.getRightNeighbor() === weight.right) {
+      this.unlinkCell(this.currentCell, DirectionType.Right);
+    }
+
+    this.sets.splice(setWithLeftIndex, 1);
+
+    const setWithRightIndex = this.sets.findIndex(set => set.includes(weight.right));
+    const setWithRight = this.sets[setWithRightIndex];
+    this.sets.splice(setWithRightIndex, 1);
+
+    this.sets.push([
+      ...setWithLeft,
+      ...setWithRight,
+    ]);
+
+    return this.generatingMaze;
+  }
+
+  getVisitedCells() {
+    return this.grid.getMatrix().flat().filter(cell => !this.unvisitedCells.includes(cell));
   }
 
   removeCellFromUnvisitedCells(removeCell: Cell) {

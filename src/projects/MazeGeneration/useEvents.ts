@@ -11,6 +11,8 @@ const useEvents = (
   instantSolutionRef: React.RefObject<HTMLInputElement>,
   showDijkstraAlgoRef: React.RefObject<HTMLInputElement>,
   dijkstraDiplayRef: React.RefObject<HTMLSelectElement>,
+  speedRef: React.RefObject<HTMLSelectElement>,
+  drawSpanningTreeRef: React.RefObject<HTMLInputElement>,
 ) => {
   useEffect(() => {
     const canvas = canvasRef.current as HTMLCanvasElement;
@@ -21,17 +23,24 @@ const useEvents = (
     const instantSolution = instantSolutionRef.current as HTMLInputElement;
     const showDijkstraAlgo = showDijkstraAlgoRef.current as HTMLInputElement;
     const dijkstraDiplay = dijkstraDiplayRef.current as HTMLSelectElement;
+    const speed = speedRef.current as HTMLSelectElement;
+    const drawSpanningTree = drawSpanningTreeRef.current as HTMLInputElement;
 
     drawFadingCells.checked = true;
     drawFadingWalls.checked = true;
     showDijkstraAlgo.checked = true;
+    speed.value = '3';
 
     const simulation = new Simulation(canvas, mazeType, instantSolution);
 
-    const drawing = new Drawing(canvas, simulation, drawFadingCells, drawFadingWalls, showDijkstraAlgo, dijkstraDiplay);
+    const drawing = new Drawing(canvas, simulation, drawFadingCells, drawFadingWalls, showDijkstraAlgo, dijkstraDiplay, drawSpanningTree);
 
     const drawingInterval = setInterval(drawing.draw, 0);
-    const updateInterval = setInterval(simulation.update, 10);
+    const updateInterval = setInterval(() => {
+      for (let i=0;i<parseFloat(speed.value);i++) {
+        simulation.update();        
+      }
+    }, 10);
     
     startButton.onclick = simulation.initialize;
     mazeType.onchange = simulation.initialize;
@@ -45,7 +54,7 @@ const useEvents = (
   }, [
     canvasRef, startButtonRef, mazeTypeRef, drawFadingCellsRef,
     drawFadingWallsRef, instantSolutionRef, showDijkstraAlgoRef,
-    dijkstraDiplayRef
+    dijkstraDiplayRef, speedRef, drawSpanningTreeRef,
   ]);
 };
 

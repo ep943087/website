@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { OptionType } from "../../forms/Select";
 import Page from "../../Layout/Page";
 import Typography from "../../utils/Typography";
-import { dijkstraDisplayTypes, mazeTypes } from "./types";
+import { dijkstraDisplayTypes, mazeTypes, speedTypes } from "./types";
 import useEvents from "./useEvents";
 
 const CanvasContainer = styled.canvas`
@@ -96,6 +96,8 @@ const MazeGeneration = () => {
   const instantSolutionRef = createRef<HTMLInputElement>();
   const showDijkstraAlgoRef = createRef<HTMLInputElement>();
   const dijkstraDiplayRef = createRef<HTMLSelectElement>();
+  const speedRef = createRef<HTMLSelectElement>();
+  const drawSpanningTreeRef = createRef<HTMLInputElement>();
 
   useEvents(
     canvasRef,
@@ -106,6 +108,8 @@ const MazeGeneration = () => {
     instantSolutionRef,
     showDijkstraAlgoRef,
     dijkstraDiplayRef,
+    speedRef,
+    drawSpanningTreeRef,
   );
   return (
     <Page>
@@ -118,8 +122,10 @@ const MazeGeneration = () => {
       <ControlsContainer>
         <ButtonContainer ref={startButtonRef}>Start</ButtonContainer>
         {renderSelectOption('Maze Type', mazeTypes, mazeTypeRef)}
+        {renderSelectOption('Speed', speedTypes, speedRef)}
         {renderCheckBox('Draw Fading Walls', drawFadingWallsRef)}
         {renderCheckBox('Draw Fading Cells', drawFadingCellsRef)}
+        {renderCheckBox('Draw Spanning Tree', drawSpanningTreeRef)}
         {renderCheckBox('Instant Solution', instantSolutionRef)}
         {renderCheckBox('Show Dijkstra\'s Algorithm', showDijkstraAlgoRef)}
         {renderSelectOption('Dijkstra Display', dijkstraDisplayTypes, dijkstraDiplayRef)}
