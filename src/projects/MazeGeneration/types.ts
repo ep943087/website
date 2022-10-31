@@ -11,6 +11,7 @@ export enum MazeType {
   Kruskal = '7',
   GrowingTree = '8',
   Eller = '9',
+  RecursiveDivision = '10',
 };
 
 export enum DijkstraDisplayType {
@@ -31,6 +32,7 @@ export const mazeTypes: OptionType[] = [
   { value: MazeType.Kruskal, label: 'Kruskal\'s' },
   { value: MazeType.GrowingTree, label: 'Growing Tree' },
   { value: MazeType.Eller, label: 'Eller\'s' },
+  { value: MazeType.RecursiveDivision, label: 'Recursive Division' },
 ];
 
 export const dijkstraDisplayTypes: OptionType[] = [

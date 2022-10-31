@@ -52,6 +52,10 @@ class Drawing {
     this.ctx.lineWidth = 1;
   }
 
+  getCellLineWidth() {
+    return this.drawSpanningTree.checked ? .2 : 1;
+  }
+
   drawGrid() {
     const matrix = this.simulation.getGrid().getMatrix();
     const { rows, cols, cellLength } = this.simulation.getDimensions();
@@ -112,7 +116,7 @@ class Drawing {
         this.ctx.fill();
     });
 
-    if (this.drawFadingCells.checked) {
+    if (this.drawFadingCells.checked && this.simulation.getMazeType() !== MazeType.RecursiveDivision) {
       this.simulation.getFadingCells().forEach(cell => {
         const { x, y } = this.convertRowColToXY(cell.getRow(), cell.getCol());
         this.ctx.fillStyle = `rgba(0, 255, 0, ${.8 * cell.getOpacity() / FadingCell.maxOpacity})`;
@@ -124,30 +128,57 @@ class Drawing {
     this.ctx.lineWidth = 1;
     for (let i=0;i<rows;i++) {
       for (let j=0;j<cols;j++) {
-        if (this.drawSpanningTree.checked) {
-          this.ctx.lineWidth = .2;
-        }
         const cell = matrix[i][j];
         const { x, y } = this.convertRowColToXY(cell.getRow(), cell.getCol());
         if (cell.isUpLink()) {
+          this.ctx.lineWidth = this.getCellLineWidth();
+          this.ctx.strokeStyle = "white";
           this.ctx.beginPath();
           this.ctx.moveTo(x, y);
           this.ctx.lineTo(x + cellLength, y);
           this.ctx.stroke();
         }
         if (cell.isDownLink()) {
+          this.ctx.lineWidth = this.getCellLineWidth();
+          this.ctx.strokeStyle = "white";
           this.ctx.beginPath();
           this.ctx.moveTo(x, y + cellLength);
           this.ctx.lineTo(x + cellLength, y + cellLength);
           this.ctx.stroke();
+          if (this.drawFadingCells.checked && this.simulation.getMazeType() === MazeType.RecursiveDivision) {
+            const fCell = this.simulation.getFadingCells().find(c => c.getRow() === cell.getRow() && c.getCol() === cell.getCol());
+            if (fCell) {
+              this.ctx.lineWidth = 3;
+              this.ctx.strokeStyle = `rgba(0, 255, 0, ${.8 * fCell.getOpacity() / FadingCell.maxOpacity})`;
+              this.ctx.beginPath();
+              this.ctx.moveTo(x, y + cellLength);
+              this.ctx.lineTo(x + cellLength, y + cellLength);
+              this.ctx.stroke();
+            }
+          }
         }
         if (cell.isRightLink()) {
+          this.ctx.lineWidth = this.getCellLineWidth();
+          this.ctx.strokeStyle = "white";
           this.ctx.beginPath();
           this.ctx.moveTo(x + cellLength, y);
           this.ctx.lineTo(x + cellLength, y + cellLength);
           this.ctx.stroke();
+          if (this.drawFadingCells.checked && this.simulation.getMazeType() === MazeType.RecursiveDivision) {
+            const fCell = this.simulation.getFadingCells().find(c => c.getRow() === cell.getRow() && c.getCol() === cell.getCol());
+            if (fCell) {
+              this.ctx.lineWidth = 3;
+              this.ctx.strokeStyle = `rgba(0, 255, 0, ${.8 * fCell.getOpacity() / FadingCell.maxOpacity})`;
+              this.ctx.beginPath();
+              this.ctx.moveTo(x + cellLength, y);
+              this.ctx.lineTo(x + cellLength, y + cellLength);
+              this.ctx.stroke();
+            }
+          }
         }
         if (cell.isLeftLink()) {
+          this.ctx.lineWidth = this.getCellLineWidth();
+          this.ctx.strokeStyle = "white";
           this.ctx.beginPath();
           this.ctx.moveTo(x, y);
           this.ctx.lineTo(x, y + cellLength);
@@ -190,7 +221,7 @@ class Drawing {
       }
     }
 
-    if (this.drawFadingWalls.checked) {
+    if (this.simulation.getMazeType() !== MazeType.RecursiveDivision && this.drawFadingWalls.checked) {
       this.ctx.lineWidth = FadingWall.lineWidth;
       this.ctx.strokeStyle = "rgba(0, 255, 0)";
       this.simulation.getFadingWalls().forEach(fadingWall => {

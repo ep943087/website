@@ -87,6 +87,34 @@ class Cell {
     }
   }
 
+  linkLeft() {
+    if (this.left.cell) {
+      this.left.link = true;
+      this.left.cell.right.link = true;
+    }
+  }
+
+  linkUp() {
+    if (this.up.cell) {
+      this.up.link = true;
+      this.up.cell.down.link = true;
+    }
+  }
+
+  linkRight() {
+    if (this.right.cell) {
+      this.right.link = true;
+      this.right.cell.left.link = true;
+    }
+  }
+
+  linkDown() {
+    if (this.down.cell) {
+      this.down.link = true;
+      this.down.cell.up.link = true;
+    }
+  }
+
   getNeighbors(): Cell[] {
     return ([
       this.getLeftNeighbor(),

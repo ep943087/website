@@ -21,10 +21,10 @@ class Simulation {
   private hunting: boolean = false;
   private backTrackingStack: Cell[] = [];
   private sets: Cell[][] = [];
-  private previousEllerSet: Cell[][] = [];
   private weights: { left: Cell, right: Cell }[] = [];
   private activeList: Cell[] = [];
   private currentRow: number = 0;
+  private wallsToAdd: { cell: Cell, linkRight: boolean }[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
@@ -91,6 +91,9 @@ class Simulation {
         break;
       case MazeType.Eller:
         this.initalizeEller();
+        break;
+      case MazeType.RecursiveDivision:
+        this.intializeRecursiveDivision();
         break;
     }
   }
@@ -167,8 +170,66 @@ class Simulation {
 
   initalizeEller() {
     this.currentRow = 0;
-    this.previousEllerSet = [];
     this.generateEllerSetsAndWeights();
+  }
+
+  intializeRecursiveDivision() {
+    this.grid.getMatrix().flat().forEach(cell => {
+      this.currentCell = cell;
+      const neighbors = cell.getNeighbors();
+      neighbors.forEach(neighbor => {
+        this.unlinkNext(neighbor);
+      });
+    });
+
+    this.currentCell = undefined;
+    this.wallsToAdd = [];
+    this.divide(0, 0, this.grid.getRows(), this.grid.getCols());
+  }
+
+  divide(row: number, column: number, height: number, width: number) {
+    if (height <= 1 || width <= 1) {
+      return;
+    }
+
+    if (height > width) {
+      this.divideHorizontally(row, column, height, width);
+    } else {
+      this.divideVertically(row, column, height, width);
+    }
+  }
+
+  divideVertically(row: number, column: number, height: number, width: number) {
+    const divideEastOf = ~~(Math.random()*(width-1));
+    const passageAt = ~~(Math.random()*(height));
+
+    for (let i=0;i<height;i++) {
+      if (passageAt === i) {
+        continue;
+      }
+      const cell = this.grid.getMatrix()[row+i][column+divideEastOf];
+      this.wallsToAdd.push({ cell, linkRight: true});
+    }
+
+    this.divide(row, column, height, divideEastOf+1);
+    this.divide(row, column+divideEastOf+1, height, width-divideEastOf-1);
+  }
+
+  divideHorizontally(row: number, column: number, height: number, width: number) {
+    const divideSouthOf = ~~(Math.random()*(height-1));
+    const passageAt = ~~(Math.random()*width);
+
+    for (let i=0;i<width;i++) {
+      if (passageAt === i) {
+        continue;
+      }
+
+      const cell = this.grid.getMatrix()[row+divideSouthOf][column+i];
+      this.wallsToAdd.push({ cell, linkRight: false});
+    }
+
+    this.divide(row, column, divideSouthOf+1, width);
+    this.divide(row+divideSouthOf+1, column, height-divideSouthOf-1, width);
   }
 
   generateEllerSetsAndWeights() {
@@ -351,6 +412,9 @@ class Simulation {
         break;
       case MazeType.Eller:
         this.updateEller();
+        break;
+      case MazeType.RecursiveDivision:
+        this.updateRecursiveDivision();
         break;
     }
 
@@ -685,7 +749,6 @@ class Simulation {
           leftSet.push(weight.right);
         }
       }
-      this.previousEllerSet = [...this.sets];
     } else if (this.sets.length > 0 && row < this.grid.getRows() - 1) {
       const set = this.sets.pop() ?? [];
       this.currentCell = set[~~(Math.random()*set.length)];
@@ -707,6 +770,30 @@ class Simulation {
       this.currentRow++;
       this.generateEllerSetsAndWeights();
     }
+
+    return this.generatingMaze;
+  }
+
+  updateRecursiveDivision() {
+    if (!this.generatingMaze) {
+      return false;
+    }
+
+    if (this.wallsToAdd.length === 0) {
+      this.generatingMaze = false;
+      return false;
+    }
+
+    const wallToAdd = this.wallsToAdd[0];
+    this.wallsToAdd.splice(0, 1);
+
+    if (wallToAdd.linkRight) {
+      wallToAdd.cell.linkRight();
+    } else {
+      wallToAdd.cell.linkDown();
+    }
+
+    this.currentCell = wallToAdd.cell;
 
     return this.generatingMaze;
   }
