@@ -41,6 +41,16 @@ const useEvents = (
         simulation.update();        
       }
     }, 10);
+
+    const handleCanvasMouseMove = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      drawing.setMousePosition({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
+    };
+
+    canvas.onmousemove = handleCanvasMouseMove;
     
     startButton.onclick = simulation.initialize;
     mazeType.onchange = simulation.initialize;

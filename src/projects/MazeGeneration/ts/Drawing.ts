@@ -7,6 +7,8 @@ import Simulation from "./Simulation";
 
 class Drawing {
   private ctx: CanvasRenderingContext2D;
+  private mousePosition: { x: number, y: number } = { x: 0, y: 0 };
+  private pathOffset: number = 0;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -20,6 +22,13 @@ class Drawing {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
   }
   
+  setMousePosition(mousePosition: { x: number, y: number }) {
+    const { x, y } = this.getCanvasTranslation();
+    mousePosition.x -= x;
+    mousePosition.y -= y;
+    this.mousePosition = mousePosition;
+  }
+
   convertRowColToXY(row: number, col: number) {
     return this.simulation.convertRowColToXY(row, col);
   }
@@ -28,28 +37,29 @@ class Drawing {
     const path = dijkstraCell.getPath();
 
     this.ctx.lineWidth = 3;
-    if (path.length > 0) {
-      const { cX, cY } = this.convertRowColToXY(path[0].getRow(), path[0].getCol());
+    path.forEach((cell, index) => {
+      if (index === path.length - 1) {
+        return;
+      }
+      const hue = ((index + this.pathOffset) % path.length) / path.length * 360;
+      this.pathOffset = (this.pathOffset + 2) % path.length;
+      this.ctx.fillStyle = this.ctx.strokeStyle = `hsl(${hue}, 50%, 50%)`;
+      const nextCell = path[index+1];
+      const { cX, cY } = this.convertRowColToXY(cell.getRow(), cell.getCol());
+      const { cX: cX2, cY: cY2 } = this.convertRowColToXY(nextCell.getRow(), nextCell.getCol());
       this.ctx.beginPath();
       this.ctx.moveTo(cX, cY);
-      for (let i=1;i<path.length;i++) {
-        const { cX, cY } = this.convertRowColToXY(path[i].getRow(), path[i].getCol());
-        this.ctx.lineTo(cX, cY);
-      }
-      this.ctx.strokeStyle = "rgba(0,150,0)";
+      this.ctx.lineTo(cX2, cY2);
       this.ctx.stroke();
+      this.ctx.closePath();
 
-      this.ctx.fillStyle = "#FFFF00";
-      this.ctx.beginPath();
-      this.ctx.arc(cX, cY, 3, 0, 2*Math.PI);
-      this.ctx.fill();
-
-      const { cX: lcX, cY: lcY } = this.convertRowColToXY(path[path.length-1].getRow(), path[path.length-1].getCol());
-      this.ctx.beginPath();
-      this.ctx.arc(lcX, lcY, 3, 0, 2*Math.PI);
-      this.ctx.fill();
-    }
-    this.ctx.lineWidth = 1;
+      if (index === 0 || index === path.length - 2) {
+        const [centerX, centerY] = index === 0 ? [cX, cY] : [cX2, cY2];
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, 3, 0, 2*Math.PI);
+        this.ctx.fill();
+      }
+    });
   }
 
   getCellLineWidth() {
@@ -85,6 +95,20 @@ class Drawing {
         this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[rows-1][cols-1]);
       } else if (this.dijkstraDiplay.value === DijkstraDisplayType.pathToMaxDistance) {
         this.drawDijkstraCellPath(grid[maxDistanceIndex]);
+      } else if (this.dijkstraDiplay.value === DijkstraDisplayType.pathToMouse) {
+        let row: number = ~~(this.mousePosition.y / this.simulation.getCellLength());
+        let col: number = ~~(this.mousePosition.x / this.simulation.getCellLength());
+        if (row < 0) {
+          row = 0;
+        } else if (row >= rows) {
+          row = rows - 1;
+        }
+        if (col < 0) {
+          col = 0;
+        } else if (col >= cols) {
+          col = cols - 1;
+        }
+        this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[row][col]);
       }
     }
 
@@ -241,6 +265,15 @@ class Drawing {
     }
   }
 
+  getCanvasTranslation() {
+    const { rows, cols } = this.simulation.getDimensions();
+    const { x: gridEndX, y: gridEndY } = this.convertRowColToXY(rows, cols);
+    return {
+      x: (this.canvas.width - gridEndX) / 2,
+      y: (this.canvas.height - gridEndY) / 2
+    };
+  }
+
   draw = () => {
     if (this.canvas.width !== this.canvas.offsetWidth || this.canvas.height !== this.canvas.offsetHeight) {
       this.canvas.width = this.canvas.offsetWidth;
@@ -253,9 +286,8 @@ class Drawing {
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.ctx.save();
-    const { rows, cols } = this.simulation.getDimensions();
-    const { x: gridEndX, y: gridEndY } = this.convertRowColToXY(rows, cols);
-    this.ctx.translate((this.canvas.width - gridEndX) / 2, (this.canvas.height - gridEndY) / 2);
+    const { x, y } = this.getCanvasTranslation();
+    this.ctx.translate(x, y);
 
     this.drawGrid();
 

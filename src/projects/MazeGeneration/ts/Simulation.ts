@@ -327,7 +327,7 @@ class Simulation {
   };
 
   performDijkstraAlgorithm() {
-    const startCell: DijkstraCell = this.dijkstraGrid[~~(this.grid.getRows()-1)][0];
+    const startCell: DijkstraCell = this.dijkstraGrid[0][0];
     startCell.setDistance(0);
 
     const openList: DijkstraCell[] = this.dijkstraGrid.flat();
