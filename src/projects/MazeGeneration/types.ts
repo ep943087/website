@@ -20,6 +20,8 @@ export enum DijkstraDisplayType {
   colorFul = '2',
   pathToMaxDistance = '3',
   pathToMouse = '4',
+  colorfulPulse = '5',
+  opacityByDistancePulse = '6',
 };
 
 export const mazeTypes: OptionType[] = [
@@ -41,7 +43,9 @@ export const dijkstraDisplayTypes: OptionType[] = [
   { value: DijkstraDisplayType.pathToMaxDistance, label: 'Path to Max Distance' },
   { value: DijkstraDisplayType.cornerToCornerPath, label: 'Corner-To-Corner Path' },
   { value: DijkstraDisplayType.opacityByDistance, label: 'Opacity by Distance' },
+  { value: DijkstraDisplayType.opacityByDistancePulse, label: 'Opacity by Distnce Pulse' },
   { value: DijkstraDisplayType.colorFul, label: 'Colorful' },
+  { value: DijkstraDisplayType.colorfulPulse, label: 'Colorful Pulse' },
 ];
 
 export const speedTypes: OptionType[] = [

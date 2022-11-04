@@ -54,13 +54,14 @@ class Drawing {
 
   drawDijkstraCellPath(dijkstraCell: DijkstraCell) {
     const path = dijkstraCell.getPath();
-    this.ctx.lineWidth = 2;
+    this.ctx.lineWidth = 1.5;
     path.forEach((cell, index) => {
       if (index === path.length - 1) {
         return;
       }
       const hue = ((index + this.pathOffset) % path.length) / path.length * 360;
       this.pathOffset = (this.pathOffset + 1) % path.length;
+      this.pathOffset = isNaN(this.pathOffset) ? 0 : this.pathOffset;
       this.ctx.fillStyle = this.ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
       const nextCell = path[index+1];
       const { cX, cY } = this.convertRowColToXY(cell.getRow(), cell.getCol());
@@ -88,7 +89,8 @@ class Drawing {
       }
     }
     const maxDistance = grid[maxDistanceIndex].getDistance();
-
+    this.pathOffset = (this.pathOffset + 3) % maxDistance;
+    this.pathOffset = isNaN(this.pathOffset) ? 0 : this.pathOffset;
     this.ctx.lineWidth = 1.5;
     grid.forEach((dCell) => {
       if (dCell.getDistance() === Infinity) {
@@ -100,8 +102,18 @@ class Drawing {
       }
       const { cX, cY } = this.convertRowColToXY(dCell.getRow(), dCell.getCol());
       const { cX: pcX, cY: pcY } = this.convertRowColToXY(previous.getRow(), previous.getCol());
-      const opacity = dCell.getDistance() / maxDistance;
-      this.ctx.fillStyle = this.ctx.strokeStyle = this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance ?
+      let opacity = 0;
+      if ([DijkstraDisplayType.opacityByDistancePulse, DijkstraDisplayType.colorfulPulse].includes(
+        this.dijkstraDiplay.value as DijkstraDisplayType
+      ) && !this.simulation.getIsGeneratingDijkstra()) {
+        opacity = ((dCell.getDistance() + this.pathOffset) % maxDistance) / maxDistance;
+      } else {
+        opacity = (dCell.getDistance()) / maxDistance;
+      }
+      
+      this.ctx.fillStyle = this.ctx.strokeStyle = [
+        DijkstraDisplayType.opacityByDistance, DijkstraDisplayType.opacityByDistancePulse
+      ].includes(this.dijkstraDiplay.value as DijkstraDisplayType) ?
         `rgba(0, 255, 0, ${opacity})` 
         : `hsl(${opacity * 260}, 100%, 50%)`;
       this.ctx.beginPath();
@@ -148,9 +160,16 @@ class Drawing {
     }
 
     if (this.simulation.getIsGeneratingDijkstra()
-      || (this.showDijkstraAlgo.checked && (this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance
-      || this.dijkstraDiplay.value === DijkstraDisplayType.colorFul))) {
+      || (this.showDijkstraAlgo.checked && [
+        DijkstraDisplayType.colorFul,
+        DijkstraDisplayType.colorfulPulse,
+        DijkstraDisplayType.opacityByDistance,
+        DijkstraDisplayType.opacityByDistancePulse,
+      ].includes(this.dijkstraDiplay.value as DijkstraDisplayType))) {
       this.drawDijkstraPathArrowsForAllCells();
+      console.log('draw');
+    } else {
+      console.log('no draw');
     }
 
     this.ctx.lineWidth = 3;
