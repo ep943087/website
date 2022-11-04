@@ -167,9 +167,6 @@ class Drawing {
         DijkstraDisplayType.opacityByDistancePulse,
       ].includes(this.dijkstraDiplay.value as DijkstraDisplayType))) {
       this.drawDijkstraPathArrowsForAllCells();
-      console.log('draw');
-    } else {
-      console.log('no draw');
     }
 
     this.ctx.lineWidth = 3;

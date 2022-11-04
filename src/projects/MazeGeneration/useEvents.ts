@@ -52,8 +52,18 @@ const useEvents = (
       });
     };
 
+    const handleCanvasTouch = (event: TouchEvent) => {
+      event.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      drawing.setMousePosition({
+        x: event.touches[0].clientX - rect.left,
+        y: event.touches[0].clientY - rect.top,
+      });
+    }
+
     canvas.onmousemove = handleCanvasMouseMove;
-    
+    canvas.ontouchstart = canvas.ontouchmove = handleCanvasTouch;
+
     startButton.onclick = simulation.initialize;
     mazeType.onchange = simulation.initialize;
 
