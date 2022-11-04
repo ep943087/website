@@ -16,6 +16,7 @@ class Simulation {
   private generatingMaze: boolean = false;
   private sideWinderCellList: Cell[] = [];
   private isMazeComplete: boolean = false;
+  private generatingDijkstra = false;
   private unvisitedCells: Cell[] = [];
   private wilsonPath: Cell[] = [];
   private hunting: boolean = false;
@@ -25,10 +26,12 @@ class Simulation {
   private activeList: Cell[] = [];
   private currentRow: number = 0;
   private wallsToAdd: { cell: Cell, linkRight: boolean }[] = [];
+  private dijkstraOpenList: DijkstraCell[] = [];
 
   constructor(
     private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
     private instantSolution: HTMLInputElement,
+    private instantDijkstra: HTMLInputElement,
   ) {}
 
   getFadingWalls() { return this.fadingWalls; }
@@ -38,6 +41,7 @@ class Simulation {
   getCellLength() { return this.cellLength; }
   getIsMazeComplete() { return this.isMazeComplete; }
   getIsGeneratingMaze() { return this.generatingMaze; }
+  getIsGeneratingDijkstra() { return this.generatingDijkstra; }
   getMazeType() { return this.mazeType.value; }
   getWilsonPath() { return this.wilsonPath; }
   getUnvisitedCells() { return this.unvisitedCells; }
@@ -60,6 +64,10 @@ class Simulation {
     this.generatingMaze = true;
     this.dijkstraGrid = DijkstraCell.getGrid(rows, cols);
     this.isMazeComplete = false;
+    this.generatingDijkstra = false;
+    const startCell: DijkstraCell = this.dijkstraGrid[0][0];
+    startCell.setDistance(0);
+    this.dijkstraOpenList = this.dijkstraGrid.flat();
 
     switch (this.mazeType.value) {
       case MazeType.BinarySearchTree:
@@ -311,71 +319,79 @@ class Simulation {
       }
     }
 
-    if (!this.generatingMaze) {
-      return;
-    }
-
     while (this.generatingMaze) {
       if (!this.updateAlgorithm()) {
         this.isMazeComplete = true;
-        this.performDijkstraAlgorithm();
+        this.generatingDijkstra = true;
       }
       if (!this.instantSolution.checked) {
         break;
       }
     }
+    while (this.generatingDijkstra) {
+      if (!this.updateDijkstra()) {
+        this.generatingDijkstra = false;
+      }
+      if (!this.instantDijkstra.checked) {
+        break;
+      }
+    }
   };
 
-  performDijkstraAlgorithm() {
-    const startCell: DijkstraCell = this.dijkstraGrid[0][0];
-    startCell.setDistance(0);
-
-    const openList: DijkstraCell[] = this.dijkstraGrid.flat();
-
-    while (openList.length > 0) {
-      let minDistanceIndex = 0;
-
-      for (let i=1;i<openList.length;i++) {
-        if (openList[i].getDistance() < openList[minDistanceIndex].getDistance()) {
-          minDistanceIndex = i;
-        }
-      }
-
-      const currentCell = openList[minDistanceIndex];
-      openList.splice(minDistanceIndex, 1);
-
-      const neighbors = [];
-      const currentGridCell = this.grid.getMatrix()[currentCell.getRow()][currentCell.getCol()];
-
-      if (!currentGridCell.isRightLink()) {
-        const rightLink = currentGridCell.getRightNeighbor();
-        if (rightLink)
-          neighbors.push(this.dijkstraGrid[rightLink?.getRow() ?? 0][rightLink?.getCol() ?? 0]);
-      }
-      if (!currentGridCell.isLeftLink()) {
-        const leftLink = currentGridCell.getLeftNeighbor();
-        if (leftLink)
-          neighbors.push(this.dijkstraGrid[leftLink?.getRow() ?? 0][leftLink?.getCol() ?? 0]);
-      }
-      if (!currentGridCell.isUpLink()) {
-        const upLink = currentGridCell.getUpNeighbor();
-        if (upLink)
-          neighbors.push(this.dijkstraGrid[upLink?.getRow() ?? 0][upLink?.getCol() ?? 0]);
-      }
-      if (!currentGridCell.isDownLink()) {
-        const downLink = currentGridCell.getDownNeighbor();
-        if (downLink)
-          neighbors.push(this.dijkstraGrid[downLink?.getRow() ?? 0][downLink?.getCol() ?? 0]);
-      }
-
-      const neighborDistance = currentCell.getDistance() + 1;
-      neighbors.forEach(neighbor => {
-        if (neighborDistance < neighbor.getDistance()) {
-          neighbor.setDistance(neighborDistance);
-          neighbor.setPrevious(currentCell);
-        }
-      });
+  updateDijkstra() {
+    if (!this.generatingDijkstra) {
+      return false;
     }
+    
+    if (this.dijkstraOpenList.length === 0) {
+      this.generatingDijkstra = false;
+      return false;
+    }
+
+    let minDistanceIndex = 0;
+
+    for (let i=1;i<this.dijkstraOpenList.length;i++) {
+      if (this.dijkstraOpenList[i].getDistance() < this.dijkstraOpenList[minDistanceIndex].getDistance()) {
+        minDistanceIndex = i;
+      }
+    }
+
+    const currentCell = this.dijkstraOpenList[minDistanceIndex];
+    this.dijkstraOpenList.splice(minDistanceIndex, 1);
+
+    const neighbors = [];
+    const currentGridCell = this.grid.getMatrix()[currentCell.getRow()][currentCell.getCol()];
+
+    if (!currentGridCell.isRightLink()) {
+      const rightLink = currentGridCell.getRightNeighbor();
+      if (rightLink)
+        neighbors.push(this.dijkstraGrid[rightLink?.getRow() ?? 0][rightLink?.getCol() ?? 0]);
+    }
+    if (!currentGridCell.isLeftLink()) {
+      const leftLink = currentGridCell.getLeftNeighbor();
+      if (leftLink)
+        neighbors.push(this.dijkstraGrid[leftLink?.getRow() ?? 0][leftLink?.getCol() ?? 0]);
+    }
+    if (!currentGridCell.isUpLink()) {
+      const upLink = currentGridCell.getUpNeighbor();
+      if (upLink)
+        neighbors.push(this.dijkstraGrid[upLink?.getRow() ?? 0][upLink?.getCol() ?? 0]);
+    }
+    if (!currentGridCell.isDownLink()) {
+      const downLink = currentGridCell.getDownNeighbor();
+      if (downLink)
+        neighbors.push(this.dijkstraGrid[downLink?.getRow() ?? 0][downLink?.getCol() ?? 0]);
+    }
+
+    const neighborDistance = currentCell.getDistance() + 1;
+    neighbors.forEach(neighbor => {
+      if (neighborDistance < neighbor.getDistance()) {
+        neighbor.setDistance(neighborDistance);
+        neighbor.setPrevious(currentCell);
+      }
+    });
+
+    return this.generatingDijkstra;
   }
 
   updateAlgorithm() {

@@ -33,44 +33,91 @@ class Drawing {
     return this.simulation.convertRowColToXY(row, col);
   }
 
+  drawArrow(cX: number, cY: number, pcX: number, pcY: number) {
+    const { cellLength } = this.simulation.getDimensions();
+    const aTip = cellLength * .22;
+    let [x1, y1, x2, y2, x3, y3] = [0, 0, 0, 0, 0, 0];
+    if (cX > pcX) {
+      [x1, y1, x2, y2, x3, y3] = [cX-aTip, cY-aTip, cX, cY, cX-aTip, cY+aTip];
+    } else if (cX < pcX) {
+      [x1, y1, x2, y2, x3, y3] = [cX+aTip, cY-aTip, cX, cY, cX+aTip, cY+aTip];
+    } else if (cY > pcY) {
+      [x1, y1, x2, y2, x3, y3] = [cX-aTip, cY-aTip, cX, cY, cX+aTip, cY-aTip];
+    } else if (cY < pcY) {
+      [x1, y1, x2, y2, x3, y3] = [cX-aTip, cY+aTip, cX, cY, cX+aTip, cY+aTip];
+    }
+    this.ctx.moveTo(x1, y1);
+    this.ctx.lineTo(x2, y2);
+    this.ctx.lineTo(x3, y3);
+    this.ctx.fill();
+  }
+
   drawDijkstraCellPath(dijkstraCell: DijkstraCell) {
     const path = dijkstraCell.getPath();
-
-    this.ctx.lineWidth = 3;
+    this.ctx.lineWidth = 2;
     path.forEach((cell, index) => {
       if (index === path.length - 1) {
         return;
       }
       const hue = ((index + this.pathOffset) % path.length) / path.length * 360;
-      this.pathOffset = (this.pathOffset + 2) % path.length;
-      this.ctx.fillStyle = this.ctx.strokeStyle = `hsl(${hue}, 50%, 50%)`;
+      this.pathOffset = (this.pathOffset + 1) % path.length;
+      this.ctx.fillStyle = this.ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
       const nextCell = path[index+1];
       const { cX, cY } = this.convertRowColToXY(cell.getRow(), cell.getCol());
-      const { cX: cX2, cY: cY2 } = this.convertRowColToXY(nextCell.getRow(), nextCell.getCol());
+      const { cX: pcX, cY: pcY } = this.convertRowColToXY(nextCell.getRow(), nextCell.getCol());
       this.ctx.beginPath();
       this.ctx.moveTo(cX, cY);
-      this.ctx.lineTo(cX2, cY2);
+      this.ctx.lineTo(pcX, pcY);
       this.ctx.stroke();
       this.ctx.closePath();
 
-      if (index === 0 || index === path.length - 2) {
-        const [centerX, centerY] = index === 0 ? [cX, cY] : [cX2, cY2];
-        this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, 3, 0, 2*Math.PI);
-        this.ctx.fill();
-      }
+      this.drawArrow(cX, cY, pcX, pcY);
     });
   }
 
   getCellLineWidth() {
-    return this.drawSpanningTree.checked ? .2 : 1;
+    return this.drawSpanningTree.checked || (this.showDijkstraAlgo.checked && this.simulation.getIsMazeComplete()) ? .2 : 1;
+  }
+
+  drawDijkstraPathArrowsForAllCells() {
+    const grid = this.simulation.getDijkstraGrid().flat();
+    let maxDistanceIndex = 0;
+    for (let i=1;i<grid.length;i++) {
+      if (grid[i].getDistance() !== Infinity && grid[i].getDistance() > grid[maxDistanceIndex].getDistance()) {
+        maxDistanceIndex = i;
+      }
+    }
+    const maxDistance = grid[maxDistanceIndex].getDistance();
+
+    this.ctx.lineWidth = 1.5;
+    grid.forEach((dCell) => {
+      if (dCell.getDistance() === Infinity) {
+        return;
+      }
+      const previous = dCell.getPrevious();
+      if (!previous) { 
+        return;
+      }
+      const { cX, cY } = this.convertRowColToXY(dCell.getRow(), dCell.getCol());
+      const { cX: pcX, cY: pcY } = this.convertRowColToXY(previous.getRow(), previous.getCol());
+      const opacity = dCell.getDistance() / maxDistance;
+      this.ctx.fillStyle = this.ctx.strokeStyle = this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance ?
+        `rgba(0, 255, 0, ${opacity})` 
+        : `hsl(${opacity * 260}, 100%, 50%)`;
+      this.ctx.beginPath();
+      this.ctx.moveTo(cX, cY);
+      this.ctx.lineTo(pcX, pcY);
+      this.ctx.stroke();
+
+      this.drawArrow(cX, cY, pcX, pcY);
+    });
   }
 
   drawGrid() {
     const matrix = this.simulation.getGrid().getMatrix();
     const { rows, cols, cellLength } = this.simulation.getDimensions();
 
-    if (this.simulation.getIsMazeComplete() && this.showDijkstraAlgo.checked) {
+    if (this.simulation.getIsMazeComplete() && !this.simulation.getIsGeneratingDijkstra() && this.showDijkstraAlgo.checked) {
       const grid = this.simulation.getDijkstraGrid().flat();
       let maxDistanceIndex = 0;
       for (let i=1;i<grid.length;i++) {
@@ -78,18 +125,6 @@ class Drawing {
           maxDistanceIndex = i;
         }
       }
-      const maxDistance = grid[maxDistanceIndex].getDistance();
-
-      grid.forEach((dCell) => {
-        const { x, y } = this.convertRowColToXY(dCell.getRow(), dCell.getCol());
-        const opacity = dCell.getDistance() / maxDistance;
-        if (this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance) {
-          this.ctx.fillStyle = `rgba(0, 255, 0, ${opacity})`;
-        } else if (this.dijkstraDiplay.value === DijkstraDisplayType.colorFul) {
-          this.ctx.fillStyle = `hsl(${opacity * 260}, 50%, 50%)`;
-        }
-        this.ctx.fillRect(x, y, cellLength, cellLength);
-      });
 
       if (this.dijkstraDiplay.value === DijkstraDisplayType.cornerToCornerPath) {
         this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[rows-1][cols-1]);
@@ -110,6 +145,12 @@ class Drawing {
         }
         this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[row][col]);
       }
+    }
+
+    if (this.simulation.getIsGeneratingDijkstra()
+      || (this.showDijkstraAlgo.checked && (this.dijkstraDiplay.value === DijkstraDisplayType.opacityByDistance
+      || this.dijkstraDiplay.value === DijkstraDisplayType.colorFul))) {
+      this.drawDijkstraPathArrowsForAllCells();
     }
 
     this.ctx.lineWidth = 3;

@@ -13,6 +13,7 @@ const useEvents = (
   dijkstraDiplayRef: React.RefObject<HTMLSelectElement>,
   speedRef: React.RefObject<HTMLSelectElement>,
   drawSpanningTreeRef: React.RefObject<HTMLInputElement>,
+  instantDijkstraRef: React.RefObject<HTMLInputElement>,
 ) => {
   useEffect(() => {
     const canvas = canvasRef.current as HTMLCanvasElement;
@@ -25,13 +26,14 @@ const useEvents = (
     const dijkstraDiplay = dijkstraDiplayRef.current as HTMLSelectElement;
     const speed = speedRef.current as HTMLSelectElement;
     const drawSpanningTree = drawSpanningTreeRef.current as HTMLInputElement;
+    const instantDijkstra = instantDijkstraRef.current as HTMLInputElement;
 
     drawFadingCells.checked = true;
     drawFadingWalls.checked = true;
     showDijkstraAlgo.checked = true;
-    speed.value = '3';
+    speed.value = '5';
 
-    const simulation = new Simulation(canvas, mazeType, instantSolution);
+    const simulation = new Simulation(canvas, mazeType, instantSolution, instantDijkstra);
 
     const drawing = new Drawing(canvas, simulation, drawFadingCells, drawFadingWalls, showDijkstraAlgo, dijkstraDiplay, drawSpanningTree);
 
@@ -40,7 +42,7 @@ const useEvents = (
       for (let i=0;i<parseFloat(speed.value);i++) {
         simulation.update();        
       }
-    }, 10);
+    }, 0);
 
     const handleCanvasMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -64,7 +66,7 @@ const useEvents = (
   }, [
     canvasRef, startButtonRef, mazeTypeRef, drawFadingCellsRef,
     drawFadingWallsRef, instantSolutionRef, showDijkstraAlgoRef,
-    dijkstraDiplayRef, speedRef, drawSpanningTreeRef,
+    dijkstraDiplayRef, speedRef, drawSpanningTreeRef, instantDijkstraRef,
   ]);
 };
 

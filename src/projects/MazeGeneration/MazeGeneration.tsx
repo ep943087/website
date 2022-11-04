@@ -97,6 +97,7 @@ const MazeGeneration = () => {
   const dijkstraDiplayRef = createRef<HTMLSelectElement>();
   const speedRef = createRef<HTMLSelectElement>();
   const drawSpanningTreeRef = createRef<HTMLInputElement>();
+  const instantDijkstraRef = createRef<HTMLInputElement>();
 
   useEvents(
     canvasRef,
@@ -109,6 +110,7 @@ const MazeGeneration = () => {
     dijkstraDiplayRef,
     speedRef,
     drawSpanningTreeRef,
+    instantDijkstraRef,
   );
   return (
     <Page>
@@ -126,6 +128,7 @@ const MazeGeneration = () => {
         {renderCheckBox('Draw Fading Cells', drawFadingCellsRef)}
         {renderCheckBox('Draw Spanning Tree', drawSpanningTreeRef)}
         {renderCheckBox('Instant Solution', instantSolutionRef)}
+        {renderCheckBox('Instant Dijkstra', instantDijkstraRef)}
         {renderCheckBox('Show Dijkstra\'s Algorithm', showDijkstraAlgoRef)}
         {renderSelectOption('Dijkstra Display', dijkstraDisplayTypes, dijkstraDiplayRef)}
       </ControlsContainer>
