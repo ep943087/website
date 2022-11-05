@@ -43,7 +43,7 @@ export const dijkstraDisplayTypes: OptionType[] = [
   { value: DijkstraDisplayType.pathToMaxDistance, label: 'Path to Max Distance' },
   { value: DijkstraDisplayType.cornerToCornerPath, label: 'Corner-To-Corner Path' },
   { value: DijkstraDisplayType.opacityByDistance, label: 'Opacity by Distance' },
-  { value: DijkstraDisplayType.opacityByDistancePulse, label: 'Opacity by Distnce Pulse' },
+  { value: DijkstraDisplayType.opacityByDistancePulse, label: 'Opacity by Distance Pulse' },
   { value: DijkstraDisplayType.colorFul, label: 'Colorful' },
   { value: DijkstraDisplayType.colorfulPulse, label: 'Colorful Pulse' },
 ];
@@ -57,3 +57,18 @@ export const speedTypes: OptionType[] = [
   { value: '15', label: '15x' },
   { value: '20', label: '20x' },
 ];
+
+export type SimulationOptionsKeys = 'mazeType' | 'speed' | 'dijkstraDisplay' | 'drawFadingWalls' | 'drawFadingCells' | 'drawSpanningTree'
+  | 'instantMaze' | 'instantDijkstra' | 'showDijkstraAlgorithm';
+
+export interface SimulationOptions {
+  mazeType: MazeType,
+  speed: string,
+  dijkstraDisplay: DijkstraDisplayType,
+  drawFadingWalls: boolean,
+  drawFadingCells: boolean,
+  drawSpanningTree: boolean,
+  instantMaze: boolean,
+  instantDijkstra: boolean,
+  showDijkstraAlgorithm: boolean,
+}

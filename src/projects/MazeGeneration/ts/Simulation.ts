@@ -1,4 +1,4 @@
-import { MazeType } from "../types";
+import { DijkstraDisplayType, MazeType, SimulationOptions } from "../types";
 import Cell from "./Cell";
 import DijkstraCell from "./DijkstraCell";
 import FadingCell from "./FadingCell";
@@ -27,11 +27,10 @@ class Simulation {
   private currentRow: number = 0;
   private wallsToAdd: { cell: Cell, linkRight: boolean }[] = [];
   private dijkstraOpenList: DijkstraCell[] = [];
+  private simulationOptions: SimulationOptions = Simulation.getInitialSimulationOptions();
 
   constructor(
-    private canvas: HTMLCanvasElement, private mazeType: HTMLSelectElement,
-    private instantSolution: HTMLInputElement,
-    private instantDijkstra: HTMLInputElement,
+    private canvas: HTMLCanvasElement
   ) {}
 
   getFadingWalls() { return this.fadingWalls; }
@@ -42,13 +41,32 @@ class Simulation {
   getIsMazeComplete() { return this.isMazeComplete; }
   getIsGeneratingMaze() { return this.generatingMaze; }
   getIsGeneratingDijkstra() { return this.generatingDijkstra; }
-  getMazeType() { return this.mazeType.value; }
+  getMazeType() { return this.simulationOptions.mazeType; }
   getWilsonPath() { return this.wilsonPath; }
   getUnvisitedCells() { return this.unvisitedCells; }
   getDimensions() {
     return {
       rows: this.grid.getRows(), cols: this.grid.getCols(), cellLength: this.cellLength,
     };
+  }
+  getSimulationOptions() { return this.simulationOptions; }
+
+  public static getInitialSimulationOptions(): SimulationOptions {
+    return {
+      mazeType: MazeType.RecursiveDivision,
+      speed: '5',
+      dijkstraDisplay: DijkstraDisplayType.pathToMouse,
+      drawFadingWalls: true,
+      drawFadingCells: true,
+      drawSpanningTree: false,
+      instantMaze: false,
+      instantDijkstra: false,
+      showDijkstraAlgorithm: true,
+    }
+  }
+
+  setSimulationOptions(simulationOptions: SimulationOptions) {
+    this.simulationOptions = simulationOptions;
   }
 
   initialize = () => {
@@ -69,7 +87,7 @@ class Simulation {
     startCell.setDistance(0);
     this.dijkstraOpenList = this.dijkstraGrid.flat();
 
-    switch (this.mazeType.value) {
+    switch (this.simulationOptions.mazeType) {
       case MazeType.BinarySearchTree:
         this.intializeBinarySearchTreeAlgorithm();
         break;
@@ -324,7 +342,7 @@ class Simulation {
         this.isMazeComplete = true;
         this.generatingDijkstra = true;
       }
-      if (!this.instantSolution.checked) {
+      if (!this.simulationOptions.instantMaze) {
         break;
       }
     }
@@ -332,7 +350,7 @@ class Simulation {
       if (!this.updateDijkstra()) {
         this.generatingDijkstra = false;
       }
-      if (!this.instantDijkstra.checked) {
+      if (!this.simulationOptions.instantDijkstra) {
         break;
       }
     }
@@ -398,7 +416,7 @@ class Simulation {
     if (this.currentCell !== undefined) {
       this.addToFadingCells(this.currentCell);
     }
-    switch (this.mazeType.value) {
+    switch (this.simulationOptions.mazeType) {
       case MazeType.BinarySearchTree:
         this.updateBinarySearchTreeAlgorithm();
         break;
@@ -693,10 +711,12 @@ class Simulation {
     const setWithRight = this.sets[setWithRightIndex];
     this.sets.splice(setWithRightIndex, 1);
 
-    this.sets.push([
-      ...setWithLeft,
-      ...setWithRight,
-    ]);
+    if (setWithLeft && setWithRight) {
+      this.sets.push([
+        ...setWithLeft,
+        ...setWithRight,
+      ]);
+    }
 
     return this.generatingMaze;
   }

@@ -13,11 +13,6 @@ class Drawing {
   constructor(
     private canvas: HTMLCanvasElement,
     private simulation: Simulation,
-    private drawFadingCells: HTMLInputElement,
-    private drawFadingWalls: HTMLInputElement,
-    private showDijkstraAlgo: HTMLInputElement,
-    private dijkstraDiplay: HTMLSelectElement,
-    private drawSpanningTree: HTMLInputElement,
   ) {
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
   }
@@ -77,11 +72,13 @@ class Drawing {
   }
 
   getCellLineWidth() {
-    return this.drawSpanningTree.checked || (this.showDijkstraAlgo.checked && this.simulation.getIsMazeComplete()) ? .2 : 1;
+    const { drawSpanningTree, showDijkstraAlgorithm } = this.simulation.getSimulationOptions();
+    return drawSpanningTree || (showDijkstraAlgorithm && this.simulation.getIsMazeComplete()) ? .2 : 1;
   }
 
   drawDijkstraPathArrowsForAllCells() {
     const grid = this.simulation.getDijkstraGrid().flat();
+    const { dijkstraDisplay } = this.simulation.getSimulationOptions();
     let maxDistanceIndex = 0;
     for (let i=1;i<grid.length;i++) {
       if (grid[i].getDistance() !== Infinity && grid[i].getDistance() > grid[maxDistanceIndex].getDistance()) {
@@ -104,7 +101,7 @@ class Drawing {
       const { cX: pcX, cY: pcY } = this.convertRowColToXY(previous.getRow(), previous.getCol());
       let opacity = 0;
       if ([DijkstraDisplayType.opacityByDistancePulse, DijkstraDisplayType.colorfulPulse].includes(
-        this.dijkstraDiplay.value as DijkstraDisplayType
+        dijkstraDisplay as DijkstraDisplayType
       ) && !this.simulation.getIsGeneratingDijkstra()) {
         opacity = ((dCell.getDistance() + this.pathOffset) % maxDistance) / maxDistance;
       } else {
@@ -113,7 +110,7 @@ class Drawing {
       
       this.ctx.fillStyle = this.ctx.strokeStyle = [
         DijkstraDisplayType.opacityByDistance, DijkstraDisplayType.opacityByDistancePulse
-      ].includes(this.dijkstraDiplay.value as DijkstraDisplayType) ?
+      ].includes(dijkstraDisplay as DijkstraDisplayType) ?
         `rgba(0, 255, 0, ${opacity})` 
         : `hsl(${opacity * 260}, 100%, 50%)`;
       this.ctx.beginPath();
@@ -127,9 +124,10 @@ class Drawing {
 
   drawGrid() {
     const matrix = this.simulation.getGrid().getMatrix();
+    const { showDijkstraAlgorithm, dijkstraDisplay, drawSpanningTree, drawFadingCells, drawFadingWalls } = this.simulation.getSimulationOptions();
     const { rows, cols, cellLength } = this.simulation.getDimensions();
 
-    if (this.simulation.getIsMazeComplete() && !this.simulation.getIsGeneratingDijkstra() && this.showDijkstraAlgo.checked) {
+    if (this.simulation.getIsMazeComplete() && !this.simulation.getIsGeneratingDijkstra() && showDijkstraAlgorithm) {
       const grid = this.simulation.getDijkstraGrid().flat();
       let maxDistanceIndex = 0;
       for (let i=1;i<grid.length;i++) {
@@ -138,11 +136,11 @@ class Drawing {
         }
       }
 
-      if (this.dijkstraDiplay.value === DijkstraDisplayType.cornerToCornerPath) {
+      if (dijkstraDisplay === DijkstraDisplayType.cornerToCornerPath) {
         this.drawDijkstraCellPath(this.simulation.getDijkstraGrid()[rows-1][cols-1]);
-      } else if (this.dijkstraDiplay.value === DijkstraDisplayType.pathToMaxDistance) {
+      } else if (dijkstraDisplay === DijkstraDisplayType.pathToMaxDistance) {
         this.drawDijkstraCellPath(grid[maxDistanceIndex]);
-      } else if (this.dijkstraDiplay.value === DijkstraDisplayType.pathToMouse) {
+      } else if (dijkstraDisplay === DijkstraDisplayType.pathToMouse) {
         let row: number = ~~(this.mousePosition.y / this.simulation.getCellLength());
         let col: number = ~~(this.mousePosition.x / this.simulation.getCellLength());
         if (row < 0) {
@@ -160,12 +158,12 @@ class Drawing {
     }
 
     if (this.simulation.getIsGeneratingDijkstra()
-      || (this.showDijkstraAlgo.checked && [
+      || (showDijkstraAlgorithm && [
         DijkstraDisplayType.colorFul,
         DijkstraDisplayType.colorfulPulse,
         DijkstraDisplayType.opacityByDistance,
         DijkstraDisplayType.opacityByDistancePulse,
-      ].includes(this.dijkstraDiplay.value as DijkstraDisplayType))) {
+      ].includes(dijkstraDisplay as DijkstraDisplayType))) {
       this.drawDijkstraPathArrowsForAllCells();
     }
 
@@ -173,7 +171,7 @@ class Drawing {
     const deadEnds: { x: number, y: number}[] = [];
     this.ctx.strokeStyle = "#FF0000";
     matrix.flat().forEach((cell) => {
-      if (this.drawSpanningTree.checked) {
+      if (drawSpanningTree) {
         const neighbors = cell.getSpanningTreeNeighbors();
         const { cX, cY } = this.convertRowColToXY(cell.getRow(), cell.getCol());
         neighbors.forEach((neighbor) => {
@@ -197,7 +195,7 @@ class Drawing {
         this.ctx.fill();
     });
 
-    if (this.drawFadingCells.checked && this.simulation.getMazeType() !== MazeType.RecursiveDivision) {
+    if (drawFadingCells && this.simulation.getMazeType() !== MazeType.RecursiveDivision) {
       this.simulation.getFadingCells().forEach(cell => {
         const { x, y } = this.convertRowColToXY(cell.getRow(), cell.getCol());
         this.ctx.fillStyle = `rgba(0, 255, 0, ${.8 * cell.getOpacity() / FadingCell.maxOpacity})`;
@@ -226,7 +224,7 @@ class Drawing {
           this.ctx.moveTo(x, y + cellLength);
           this.ctx.lineTo(x + cellLength, y + cellLength);
           this.ctx.stroke();
-          if (this.drawFadingCells.checked && this.simulation.getMazeType() === MazeType.RecursiveDivision) {
+          if (drawFadingCells && this.simulation.getMazeType() === MazeType.RecursiveDivision) {
             const fCell = this.simulation.getFadingCells().find(c => c.getRow() === cell.getRow() && c.getCol() === cell.getCol());
             if (fCell) {
               this.ctx.lineWidth = 3;
@@ -245,7 +243,7 @@ class Drawing {
           this.ctx.moveTo(x + cellLength, y);
           this.ctx.lineTo(x + cellLength, y + cellLength);
           this.ctx.stroke();
-          if (this.drawFadingCells.checked && this.simulation.getMazeType() === MazeType.RecursiveDivision) {
+          if (drawFadingCells && this.simulation.getMazeType() === MazeType.RecursiveDivision) {
             const fCell = this.simulation.getFadingCells().find(c => c.getRow() === cell.getRow() && c.getCol() === cell.getCol());
             if (fCell) {
               this.ctx.lineWidth = 3;
@@ -302,7 +300,7 @@ class Drawing {
       }
     }
 
-    if (this.simulation.getMazeType() !== MazeType.RecursiveDivision && this.drawFadingWalls.checked) {
+    if (this.simulation.getMazeType() !== MazeType.RecursiveDivision && drawFadingWalls) {
       this.ctx.lineWidth = FadingWall.lineWidth;
       this.ctx.strokeStyle = "rgba(0, 255, 0)";
       this.simulation.getFadingWalls().forEach(fadingWall => {
