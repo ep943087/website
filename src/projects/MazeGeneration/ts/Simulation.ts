@@ -66,7 +66,11 @@ class Simulation {
   }
 
   setSimulationOptions(simulationOptions: SimulationOptions) {
+    const willInitialize = simulationOptions.mazeType !== this.simulationOptions.mazeType;
     this.simulationOptions = simulationOptions;
+    if (willInitialize) {
+      this.initialize();
+    }
   }
 
   initialize = () => {

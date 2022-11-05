@@ -93,11 +93,7 @@ const MazeGeneration = () => {
 
   useEffect(() => {
     if (simulation.constructor.name !== 'Simulation') { return }
-    const oldMazeType = simulation.getSimulationOptions().mazeType;
     simulation.setSimulationOptions(options);
-    if (options.mazeType !== oldMazeType) {
-      simulation.initialize();
-    }
   }, [options, simulation]);
 
   return (

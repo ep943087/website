@@ -58,8 +58,6 @@ const useCanvas = (
     canvas.onmousemove = handleCanvasMouseMove;
     canvas.ontouchstart = canvas.ontouchmove = handleCanvasTouch;
 
-    setTimeout(simulation.initialize, 100);
-
     return () => {
       clearInterval(drawingInterval);
       clearInterval(updateInterval);
