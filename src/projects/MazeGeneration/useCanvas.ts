@@ -10,9 +10,6 @@ const useCanvas = (
   const [options, setOptions] = useState<SimulationOptions>(Simulation.getInitialSimulationOptions);
 
   const handleRunButtonClicked = () => {
-    if (mySimulation.constructor.name !== 'Simulation') {
-      return;
-    }
     mySimulation.initialize();
   };
 
