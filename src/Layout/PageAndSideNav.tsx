@@ -11,7 +11,7 @@ const PageAndSideNav = (props: PageAndSideNavProps) => {
     <div className="pageAndSideNav">
       <div className="pageAndSideNav__sidebar swipeLeft">
         {props.sidebarLinks.map(link => (
-          <SideBarLink {...link} />
+          <SideBarLink key={link.label} {...link} />
         ))}
       </div>
       <div className="pageAndSideNav__page swipeLeft">

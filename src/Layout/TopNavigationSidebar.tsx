@@ -7,7 +7,7 @@ const TopNavigationSidebar = (props: TopNavigationSidebarProps) => {
   return (
     <div className={`topNavigationSidebar${showClassName}`}>
       {props.topNavLinks.map(link => (
-        <Link to={link.link}>{link.label}</Link>
+        <Link key={link.link} to={link.link}>{link.label}</Link>
       ))}
     </div>
   );

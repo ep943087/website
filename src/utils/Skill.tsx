@@ -43,7 +43,7 @@ const Skill = (props: SkillProps) => {
             } else if (index - .5 === props.stars) {
               style.background = 'linear-gradient(90deg, yellow 50%, rgba(0,0,0,0) 50%)';
             }
-            return <StarContainer style={style} />;
+            return <StarContainer key={index} style={style} />;
         })}
       </StarsContainer>
     </SkillContainer>

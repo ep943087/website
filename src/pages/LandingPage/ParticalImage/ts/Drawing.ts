@@ -4,7 +4,7 @@ class Drawing {
   private ctx: CanvasRenderingContext2D;
 
   constructor(private canvas: HTMLCanvasElement, private simulation: Simulation) {
-    this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.ctx = this.canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
   }
 
   draw = () => {

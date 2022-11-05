@@ -11,7 +11,7 @@ const Form = (props: FormProps) => {
   const getFormErrors = () => (
     <ul className="error-list">
       {props.errors.map((error) => {
-        return <li className="error">{error}</li>
+        return <li key={error} className="error">{error}</li>
       })}
     </ul>
   );

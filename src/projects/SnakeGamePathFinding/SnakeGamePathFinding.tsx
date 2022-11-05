@@ -73,7 +73,7 @@ const renderSelectOption = (label: string, options: OptionType[], selectRef: Rea
     <label>{label}</label>
     <SelectContainer ref={selectRef}>
       {options.map(option => (
-        <option value={option.value}>{option.label}</option>
+        <option key={option.value} value={option.value}>{option.label}</option>
       ))}
     </SelectContainer>
   </SelectLabelContainer>

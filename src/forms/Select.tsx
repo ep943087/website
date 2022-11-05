@@ -16,7 +16,7 @@ const Select = (props: SelectProps) => {
       <Typography variant="body">{props.label}</Typography>
       <SelectContainer onChange={(e) => props.onChange(e.target.value)}>
         {props.options.map(option => (
-          <option value={option.value} selected={option.value === props.value}>{option.label}</option>
+          <option key={option.value} value={option.value} selected={option.value === props.value}>{option.label}</option>
         ))}
       </SelectContainer>
     </Container>

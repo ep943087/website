@@ -39,7 +39,7 @@ class Simulation {
 
     const { width, height } = this.canvas;
 
-    const context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+    const context = this.canvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D;
     context.drawImage(this.image, 0, 0, width, height);
     const pixels = context.getImageData(0, 0, width, height).data;
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);

@@ -97,7 +97,7 @@ const renderSVG = (svg: React.ReactNode, link: string) => {
 const renderSkillsList = (skills: SkillProps[]) => (
   <SkillsContainer>
     {skills.sort((a, b) => b.stars - a.stars).map(skill=> (
-      <Skill { ...skill }/>
+      <Skill key={skill.title} { ...skill }/>
     ))}
   </SkillsContainer>
 );

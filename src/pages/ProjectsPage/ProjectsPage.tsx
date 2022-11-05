@@ -59,7 +59,7 @@ const renderProjectsList = (projects: ProjectType[]) => (
         );
       } else {
         return (
-          <Link to={project.linkURL}>
+          <Link key={index} to={project.linkURL}>
             {projectContent}
           </Link>
         );
