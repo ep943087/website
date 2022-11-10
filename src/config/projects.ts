@@ -29,12 +29,6 @@ export const simulationProjects: ProjectType[] = [
     externalLink: true,
     caption: 'Binary Tree',
   },
-  {
-    imageURL: '/path-finding.png',
-    linkURL: 'http://ada.cameron.edu/~ep943087/practice/pathfinding/',
-    externalLink: true,
-    caption: 'Path Finding',
-  },
 ];
 
 export const gameProjects: ProjectType[] = [

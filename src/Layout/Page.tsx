@@ -5,8 +5,17 @@ const Page = (props: PageProps) => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const style: React.CSSProperties = {
+    ...(() => (
+      props.flexColumn ? {
+        display: 'flex',
+        flexDirection: 'column',
+      } : {}
+    ))()
+  };
   return (
-    <div className={`page swipeLeft`}>
+    <div className={`page swipeLeft`} style={style}>
       {props.children}
     </div>
   );
@@ -14,6 +23,11 @@ const Page = (props: PageProps) => {
 
 interface PageProps {
   children: React.ReactNode,
+  flexColumn?: boolean,
+}
+
+Page.defaultProps = {
+  flexColumn: false,
 }
 
 export default Page;

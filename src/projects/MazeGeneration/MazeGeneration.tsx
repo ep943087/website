@@ -1,4 +1,4 @@
-import React, { createRef, useEffect } from "react";
+import React, { createRef } from "react";
 import styled from "styled-components";
 import { OptionType } from "../../forms/Select";
 import Page from "../../Layout/Page";
@@ -71,7 +71,7 @@ const ButtonContainer = styled.button`
 const MazeGeneration = () => {
 
   const canvasRef = createRef<HTMLCanvasElement>();
-  const { simulation, options, handleChange, handleRunButtonClicked, } = useCanvas(canvasRef);
+  const { options, handleChange, handleRunButtonClicked, } = useCanvas(canvasRef);
 
   const renderSelectOption = (label: string, selectOptions: OptionType[], name: SimulationOptionsKeys) => (
     <SelectLabelContainer>
@@ -90,11 +90,6 @@ const MazeGeneration = () => {
       <input onChange={(e: React.FormEvent<HTMLInputElement>) => {handleChange(name, !options[name])}} checked={options[name] as boolean} type="checkbox" />
     </SelectLabelContainer>
   );
-
-  useEffect(() => {
-    if (simulation.constructor.name !== 'Simulation') { return }
-    simulation.setSimulationOptions(options);
-  }, [options, simulation]);
 
   return (
     <Page>

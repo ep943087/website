@@ -7,6 +7,7 @@
   border-radius: 5px;
   padding: var(--container-padding);
   min-height: calc(100vh - 2 * var(--topNavHeight) - 2 * var(--container-padding));
+  overflow: hidden;
 }
 
 .swipeRight {

@@ -62,6 +62,11 @@ const useCanvas = (
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (Object.keys(mySimulation).length === 0) { return; }
+    mySimulation.setSimulationOptions(options);
+  }, [options, mySimulation]);
+
   return {
     simulation: mySimulation,
     options,
