@@ -18,6 +18,11 @@ class Simulation {
   private options: SimulationOptions = Simulation.getDefaultOptions();
   private isMouseDown: boolean = false;
   public static readonly spongeBobImage: string = '/spongebob.jpg';
+  public static readonly selfPortrait: string = '/portrait.jpg';
+  private fillStack: { row: number, col: number }[] = [];
+  private oldHidden: boolean = false;
+  private oldColor: string = '';
+  private unvisitedFillParticles: Particle[] = [];
 
   public static getDefaultOptions(): SimulationOptions {
     return {
@@ -25,7 +30,11 @@ class Simulation {
       color: '#00ff00',
       penSize: 5,
       editType: EditType.draw,
-      mouseSize: '10',
+      mouseSize: 10,
+      showFill: false,
+      accAwayFromMouse: 10,
+      accTowardsTarget: 1,
+      friction: 10,
     };
   }
 
@@ -179,14 +188,19 @@ class Simulation {
       for (let j=0;j<this.cols;j++) {
         const position = new Point(offsetX + j*Simulation.GAP, offsetY + i*Simulation.GAP);
         const target = new Point(offsetX + j*Simulation.GAP, offsetY + i*Simulation.GAP);
-        gridRow.push(new Particle(position, target, 'blue'));
+        const particle = new Particle(position, target, 'green');
+        particle.setHidden(true);
+        gridRow.push(particle);
       }
       this.particlesGrid.push(gridRow);
     }
   }
 
   clear() {
-    this.particlesGrid.flat().forEach(particle => particle.setHidden(true));
+    this.fillStack = [];
+    this.particlesGrid.flat().forEach(particle => {
+      particle.setHidden(true)
+    });
   }
 
   setParticlesPositionToTarget() {
@@ -197,41 +211,52 @@ class Simulation {
     const { row, col } = this.convertXYToParticleRowCol(this.mousePosition.getX(), this.mousePosition.getY());
     if (row >= 0 && row < this.rows && col >= 0 && col < this.cols) {
       const currentCell = this.particlesGrid[row][col];
-      const unvisitedParticles = this.particlesGrid.flat();
-      this.fillRecursively(row, col, unvisitedParticles, currentCell.getColor(), currentCell.getHidden());
+      this.unvisitedFillParticles = this.particlesGrid.flat();
+      this.fillStack = [{ row, col }];
+      this.oldColor = currentCell.getColor();
+      this.oldHidden = currentCell.getHidden();
+      while (this.isFilling()) {
+        this.fillIteration();
+        if (this.options.showFill) {
+          break;
+        }
+      }
     }
   }
 
-  private fillRecursively(row: number, col: number, unvisitedParticles: Particle[], oldColor: string, hidden: boolean) {
+  isFilling() {
+    return this.fillStack.length > 0;
+  }
+
+  fillIteration() {
+    if (this.fillStack.length === 0) { return; }
+    const { row, col } = this.fillStack[0];
     const particle = this.particlesGrid[row][col];
-
-    if (!unvisitedParticles.includes(particle)) {
+    this.fillStack.splice(0, 1);
+    if (!this.unvisitedFillParticles.includes(particle)
+      || (this.oldHidden && !particle.getHidden())
+      || (!this.oldHidden && (particle.getColor() !== this.oldColor))) {
       return;
     }
-
-    if (hidden && !particle.getHidden()) {
-      return;
+    if (this.options.editType === EditType.fill) {
+      particle.setColor(this.options.color);
+      particle.setHidden(false);
+    } else if (this.options.editType === EditType.fillDelete) {
+      particle.setHidden(true);
     }
-
-    if (!hidden && (particle.getColor() !== oldColor)) {
-      return;
-    }
-
-    particle.setColor(this.options.color);
-    particle.setHidden(false);
-    unvisitedParticles.splice(unvisitedParticles.findIndex(cell => cell === particle), 1);
+    this.unvisitedFillParticles.splice(this.unvisitedFillParticles.findIndex(cell => cell === particle), 1);
 
     if (row > 0) {
-      this.fillRecursively(row-1, col, unvisitedParticles, oldColor, hidden);
+      this.fillStack.push({ row: row-1, col });
     }
     if (row < this.rows - 1) {
-      this.fillRecursively(row+1, col, unvisitedParticles, oldColor, hidden);
+      this.fillStack.push({ row: row+1, col });
     }
     if (col > 0) {
-      this.fillRecursively(row, col-1, unvisitedParticles, oldColor, hidden);
+      this.fillStack.push({ row, col: col-1 });
     }
     if (col < this.cols - 1) {
-      this.fillRecursively(row, col+1, unvisitedParticles, oldColor, hidden);
+      this.fillStack.push({ row, col: col+1 });
     }
   }
 
@@ -259,10 +284,15 @@ class Simulation {
   }
 
   update = () => {
+    if (this.isFilling()) {
+      for (let i=0;i<250;i++) {
+        this.fillIteration();
+      }
+      return;
+    }
     if (this.options.editMode) { return; }
     this.particlesGrid.flat().forEach(particle => {
-      if (particle.getHidden()) { return; }
-      particle.update(this.mousePosition, parseInt(this.options.mouseSize)*9, this.isMouseDown);
+      particle.update(this.mousePosition, parseInt(this.options.mouseSize.toString())*9, this.isMouseDown, this.options);
     })
   }
 }

@@ -1,10 +1,10 @@
 import React, { createRef } from "react";
 import styled from "styled-components";
-import { OptionType } from "../../forms/Select";
 import Page from "../../Layout/Page";
 import Button from "../../utils/Button";
 import Typography from "../../utils/Typography";
-import { editTypes, SimulationOptionsKeys } from "./ts/types";
+import Simulation from "./ts/Simulation";
+import { EditType, editTypes, SimulationOptionsKeys } from "./ts/types";
 import useCanvas from "./ts/useCanvas";
 
 const CanvasWrapper = styled.div`
@@ -42,14 +42,6 @@ const SelectOptionContainer = styled.div`
   width: 100%;
 `;
 
-const SelectContainer = styled.select`
-  color: black;
-  padding: 5px;
-  > option {
-    color: inherit;
-  }
-`;
-
 const ButtonsContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -64,7 +56,8 @@ const Particles = () => {
     options,
     handleChange,
     handleClearButtonClicked,
-    copySpongebogImage,
+    copyImage,
+    handleFileInputChange,
   } = useCanvas(canvasRef);
 
   const renderSlider = (name: SimulationOptionsKeys, label: string, min: number, max: number) => {
@@ -72,22 +65,6 @@ const Particles = () => {
       <SelectOptionContainer>
         <label>{label}</label>
         <input type="range" min={min} max={max} value={options[name] as string} onChange={(e: React.FormEvent<HTMLInputElement>) => handleChange(name, e.currentTarget.value)} />
-      </SelectOptionContainer>
-    );
-  };
-
-  const renderSelect = (name: SimulationOptionsKeys, label: string, selectOptions: OptionType[]) => {
-    return (
-      <SelectOptionContainer>
-        <label>{label}</label>
-        <SelectContainer
-          value={options[name]?.toString() ?? ''}
-          onChange={(e: React.FormEvent<HTMLSelectElement>) => handleChange(name, e.currentTarget.value)}
-        >
-          {selectOptions.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </SelectContainer>
       </SelectOptionContainer>
     );
   };
@@ -112,19 +89,48 @@ const Particles = () => {
         <CanvasControls>
           {renderCheckBox('editMode', 'Edit Mode')}
           {!options.editMode && (
-            renderSlider('mouseSize', 'Mouse Size', 1, 30)
+            <>
+              {renderSlider('mouseSize', 'Mouse Size', 1, 30)}
+              {/* {renderSlider('accTowardsTarget', 'Acc Towards Target', 1, 10)} */}
+              {renderSlider('accAwayFromMouse', 'Acc Away From Mouse', 1, 10)}
+              {renderSlider('friction', 'Friction', 1, 15)}
+            </>
           )}
           {options.editMode && (
             <>
-              <SelectOptionContainer>
-                <label>Color</label>
-                <input type="color" value={options.color} onChange={(e: React.FormEvent<HTMLInputElement>) => handleChange('color', e.currentTarget.value)} />
-              </SelectOptionContainer>
-              {renderSlider('penSize', 'Pen Size', 1, 20)}
-              {renderSelect('editType', 'Edit Type', editTypes)}
               <ButtonsContainer>
-                <Button label="Clear" onClick={handleClearButtonClicked} />
-                <Button label="Spongebob" onClick={copySpongebogImage} />
+                {editTypes.map(option => (
+                  <span key={option.value}>
+                    <input
+                      onChange={() => handleChange('editType', option.value)}
+                      type="radio"
+                      value={option.value}
+                      checked={option.value === options.editType}
+                    />
+                    <span onClick={() => handleChange('editType', option.value)}>
+                      &nbsp;{option.label}
+                    </span>
+                  </span>
+                ))}
+              </ButtonsContainer>
+              {[EditType.draw, EditType.erase].includes(options.editType) && renderSlider('penSize', 'Pen Size', 1, 40)}
+              {[EditType.draw, EditType.fill].includes(options.editType)
+                && (
+                <SelectOptionContainer>
+                  <label>Color</label>
+                  <input type="color" value={options.color} onChange={(e: React.FormEvent<HTMLInputElement>) => handleChange('color', e.currentTarget.value)} />
+                </SelectOptionContainer>
+                )
+              }
+              <SelectOptionContainer>
+                <label>Image</label>
+                <input type="file" onChange={handleFileInputChange} />
+              </SelectOptionContainer>
+              {renderCheckBox('showFill', 'Show Fill')}
+              <ButtonsContainer>
+                <Button label="Clear" color="red" onClick={handleClearButtonClicked} />
+                <Button label="Spongebob" onClick={() => copyImage(Simulation.spongeBobImage)} />
+                <Button label="Portrait" onClick={() => copyImage(Simulation.selfPortrait)} />
               </ButtonsContainer>
             </>
           )}

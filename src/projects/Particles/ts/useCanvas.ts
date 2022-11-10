@@ -18,8 +18,25 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     mySimulation.clear();
   };
 
-  const copySpongebogImage = () => {
-    mySimulation.copyImage(Simulation.spongeBobImage);
+  const handleFileInputChange = (evt: React.FormEvent<HTMLInputElement>) => {
+    const files = evt.currentTarget.files;
+    if (!files) {
+      return;
+    }
+    const f = files[0];
+    var reader = new FileReader();
+    reader.onload = ((theFile) => (
+      (e) => {
+          if (e?.target?.result) {
+            mySimulation.copyImage(e.target.result as string);
+          }
+        }
+      ))(f);
+    reader.readAsDataURL(f);
+  };
+
+  const copyImage = (img: string) => {
+    mySimulation.copyImage(img);
   };
 
   useEffect(() => {
@@ -48,7 +65,7 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     canvas.onmouseup = (e: MouseEvent) => {
       simulation.setIsMouseDown(false);
       const { editType, editMode } = simulation.getOptions();
-      if (editMode && editType === EditType.fill) {
+      if (editMode && (editType === EditType.fill || editType === EditType.fillDelete)) {
         simulation.fill();
       }
     };
@@ -92,7 +109,8 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     options,
     handleChange,
     handleClearButtonClicked,
-    copySpongebogImage,
+    copyImage,
+    handleFileInputChange,
   }
 };
 

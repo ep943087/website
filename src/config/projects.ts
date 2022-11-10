@@ -24,10 +24,10 @@ export const simulationProjects: ProjectType[] = [
     caption: 'Maze Generation',
   },
   {
-    imageURL: '/binary-search-tree.png',
-    linkURL: 'http://ada.cameron.edu/~ep943087/practice/binary_tree/',
-    externalLink: true,
-    caption: 'Binary Tree',
+    imageURL: '/particles.png',
+    linkURL: '/projects/particles',
+    externalLink: false,
+    caption: 'Particles',
   },
 ];
 
