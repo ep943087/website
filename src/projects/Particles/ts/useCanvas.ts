@@ -50,7 +50,7 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
 
     setMySimulation(simulation);
 
-    canvas.onmousedown = (e: MouseEvent) => {
+    canvas.onmousedown = canvas.ontouchstart = () => {
       simulation.setIsMouseDown(true);
 
       if (simulation.getOptions().editMode && simulation.getIsMouseDown()) {
@@ -58,11 +58,11 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
       }
     };
 
-    canvas.onmouseout = (e: MouseEvent) => {
+    canvas.onmouseout = canvas.ontouchcancel = () => {
       simulation.setIsMouseDown(false);
     }
 
-    canvas.onmouseup = (e: MouseEvent) => {
+    canvas.onmouseup = canvas.ontouchend = () => {
       simulation.setIsMouseDown(false);
       const { editType, editMode } = simulation.getOptions();
       if (editMode && (editType === EditType.fill || editType === EditType.fillDelete)) {
@@ -89,6 +89,10 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
         e.touches[0].clientX - rect.left,
         e.touches[0].clientY - rect.top,
       );
+
+      if (simulation.getOptions().editMode && simulation.getIsMouseDown()) {
+        simulation.penDraw();
+      }
     }
 
     return () => {
