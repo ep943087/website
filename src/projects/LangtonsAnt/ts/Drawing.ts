@@ -10,11 +10,12 @@ class Drawing {
   }
 
   drawGrid() {
+    const cellWidth = this.simulation.getCellWidth();
     this.simulation.getGrid().flat().forEach(cell => {
       this.ctx.fillStyle = cell.getColor();
       if (cell.hasColor()) {
         const { x, y } = this.simulation.convertRowColToXY(cell.getRow(), cell.getCol());
-        this.ctx.fillRect(x, y, Simulation.CELL_WIDTH, Simulation.CELL_WIDTH);
+        this.ctx.fillRect(x, y, cellWidth, cellWidth);
       }
     });
   }

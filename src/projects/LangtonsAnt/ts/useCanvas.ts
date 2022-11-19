@@ -1,9 +1,23 @@
 import React, { useEffect, useState } from "react";
 import Drawing from "./Drawing";
 import Simulation from "./Simulation";
+import { SimulationOptions, SimulationOptionsKeys } from "./types";
 
 const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   const [mySimulation, setMySimulation] = useState<Simulation>({} as Simulation);
+  const [options, setOptions] = useState<SimulationOptions>(Simulation.getDefaultOptions());
+
+  const handleOptionChange = (key: SimulationOptionsKeys, value: string | string[] | number) => {
+    setOptions(prevOptions => ({
+      ...prevOptions,
+      [key]: value,
+    }));
+  };
+
+  useEffect(() => {
+    if (Object.keys(mySimulation).length === 0) { return; }
+    mySimulation.setOptions(options);
+  }, [options, mySimulation]);
 
   const handleResetClicked = () => {
     mySimulation.initialize();
@@ -36,6 +50,8 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   return {
     simulation: mySimulation,
     handleResetClicked,
+    options,
+    handleOptionChange,
   };
 };
 

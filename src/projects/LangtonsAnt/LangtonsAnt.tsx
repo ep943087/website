@@ -1,8 +1,10 @@
-import { createRef } from "react";
+import React, { createRef } from "react";
 import styled from "styled-components";
+import { OptionType } from "../../forms/Select";
 import Page from "../../Layout/Page";
 import Button from "../../utils/Button";
 import Typography from "../../utils/Typography";
+import { SimulationOptionsKeys, SpeedOptions, TurnPatterns } from "./ts/types";
 import useCanvas from "./ts/useCanvas";
 
 const CanvasWrapperStyle = styled.div`
@@ -26,17 +28,69 @@ const CanvasStyle = styled.canvas`
   }
 `;
 
-// const FieldLabelStyle = styled.div`
-//   display: flex;
-//   width: 100%;
-//   max-width: 250px;
-//   justify-content: space-between;
-// `;
+const FieldLabelStyle = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 250px;
+  justify-content: space-between;
+`;
+
+const SelectStyle = styled.select`
+  color: black;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  padding: 10px;
+
+  > option {
+    color: inherit;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: 10px;
+  }
+`;
+
+const ColorWrapperStyle = styled.div`
+  display: flex;
+  width: 100%;
+  max-width: 300px;
+  flex-wrap: wrap;
+  justify-content: start;
+`;
 
 const LangtonsAnt = () => {
 
   const canvasRef = createRef<HTMLCanvasElement>();
-  const { handleResetClicked} = useCanvas(canvasRef);
+  const { handleResetClicked, options, handleOptionChange } = useCanvas(canvasRef);
+
+  const handleColorChange = (newColor: string, index: number) => {
+    const newColors = [...options.colors];
+    newColors[index] = newColor;
+    handleOptionChange('colors', newColors);
+  };
+
+  const renderSelect = (name: SimulationOptionsKeys, label: string, selectOptions: OptionType[], isNumber: boolean = false) => (
+    <FieldLabelStyle>
+      <label>{label}</label>
+      <SelectStyle value={options[name]} onChange={(e: React.FormEvent<HTMLSelectElement>) => (
+        handleOptionChange(name, isNumber ? parseInt(e.currentTarget.value) : e.currentTarget.value)
+      )}>
+        {selectOptions.map(option => (
+          <option key={option.value} value={option.value}>{option.label}</option>
+        ))}
+      </SelectStyle>
+    </FieldLabelStyle>
+  );
+
+  const renderSlider = (name: SimulationOptionsKeys, label: string, min: number, max: number) => (
+    <FieldLabelStyle>
+      <label>{label}</label>
+      <input type="range" value={options[name]} min={min} max={max} onChange={(e: React.FormEvent<HTMLInputElement>) => (
+        handleOptionChange(name, parseInt(e.currentTarget.value))
+      )} />
+    </FieldLabelStyle>
+  );
 
   return (
     <Page>
@@ -44,6 +98,22 @@ const LangtonsAnt = () => {
       <CanvasWrapperStyle>
         <CanvasStyle ref={canvasRef} />
         <Button onClick={handleResetClicked} label="Reset" />
+        {renderSelect('turnPattern', 'Turn Pattern', TurnPatterns)}
+        {renderSlider('speed', 'Speed', 0, SpeedOptions.length-1)}
+        {renderSlider('cellWidth', 'Cell Width', 2, 8)}
+        <ColorWrapperStyle>
+          {options.turnPattern.split('').map((_, index) => {
+            if (index === 0) {
+              return null;
+            } else {
+              return (
+                <input key={index} type="color" value={options.colors[index]} onChange={(e: React.FormEvent<HTMLInputElement>) => (
+                  handleColorChange(e.currentTarget.value, index)
+                )} />
+              )
+            }
+          })}
+        </ColorWrapperStyle>
       </CanvasWrapperStyle>
     </Page>
   );
