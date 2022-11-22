@@ -58,7 +58,7 @@ export const TurnPatterns: OptionType[] = [
   { value: 'RLLRRRLRRRRR', label: 'RLLRRRLRRRRR' },
   { value: 'RLRLRRRRRRRL', label: 'RLRLRRRRRRRL' },
   { value: 'LLLLLLLRRRLR', label: 'LLLLLLLRRRLR' },
-];
+].sort((a, b) => a.value.length - b.value.length);
 
 export const ColorPatterns: string[] = Array(100).fill(0).map(
   (_, index) => index === 0 ? '' : CanvasTools.generateRandomColor()
@@ -82,12 +82,13 @@ export const SpeedOptions: number[] = [
   100000,
 ];
 
-export type SimulationOptionsKeys = 'turnPattern' | 'startDirection' | 'colors' | 'cellWidth' | 'speed';
+export type SimulationOptionsKeys = 'turnPattern' | 'colors' | 'cellWidth' | 'speed' | 'edit' | 'wrap';
 
 export interface SimulationOptions {
   turnPattern: string;
-  startDirection: Directions;
   colors: string[],
   cellWidth: number,
   speed: number,
+  edit: boolean,
+  wrap: boolean,
 };

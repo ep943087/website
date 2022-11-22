@@ -31,6 +31,7 @@ class Simulation {
     this.rows = Math.floor(this.canvas.height / this.cellLength);
     this.cols = Math.floor(this.canvas.width / this.cellLength); 
     this.snake.initialize(this.rows / 2, this.cols / 2);
+    this.path = [];
     this.initializeFruit();
   }
 

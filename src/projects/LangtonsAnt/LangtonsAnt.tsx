@@ -62,7 +62,7 @@ const ColorWrapperStyle = styled.div`
 const LangtonsAnt = () => {
 
   const canvasRef = createRef<HTMLCanvasElement>();
-  const { handleResetClicked, options, handleOptionChange } = useCanvas(canvasRef);
+  const { handleResetClicked, options, handleOptionChange, simulation } = useCanvas(canvasRef);
 
   const handleColorChange = (newColor: string, index: number) => {
     const newColors = [...options.colors];
@@ -73,7 +73,7 @@ const LangtonsAnt = () => {
   const renderSelect = (name: SimulationOptionsKeys, label: string, selectOptions: OptionType[], isNumber: boolean = false) => (
     <FieldLabelStyle>
       <label>{label}</label>
-      <SelectStyle value={options[name]} onChange={(e: React.FormEvent<HTMLSelectElement>) => (
+      <SelectStyle value={options[name] as number} onChange={(e: React.FormEvent<HTMLSelectElement>) => (
         handleOptionChange(name, isNumber ? parseInt(e.currentTarget.value) : e.currentTarget.value)
       )}>
         {selectOptions.map(option => (
@@ -86,9 +86,16 @@ const LangtonsAnt = () => {
   const renderSlider = (name: SimulationOptionsKeys, label: string, min: number, max: number) => (
     <FieldLabelStyle>
       <label>{label}</label>
-      <input type="range" value={options[name]} min={min} max={max} onChange={(e: React.FormEvent<HTMLInputElement>) => (
+      <input type="range" value={options[name] as number} min={min} max={max} onChange={(e: React.FormEvent<HTMLInputElement>) => (
         handleOptionChange(name, parseInt(e.currentTarget.value))
       )} />
+    </FieldLabelStyle>
+  );
+
+  const renderCheckbox = (name: SimulationOptionsKeys, label: String) => (
+    <FieldLabelStyle>
+      <label>{label}</label>
+      <input type="checkbox" checked={options[name] as boolean} onChange={() => handleOptionChange(name, !options[name])} />
     </FieldLabelStyle>
   );
 
@@ -97,7 +104,12 @@ const LangtonsAnt = () => {
       <Typography textAlign="center" variant="title">Langton&apos;s Ant</Typography>
       <CanvasWrapperStyle>
         <CanvasStyle ref={canvasRef} />
-        <Button onClick={handleResetClicked} label="Reset" />
+        <div>
+          {!options.edit && <Button onClick={handleResetClicked} label="Reset" />}
+          {options.edit && <Button onClick={() => simulation.addAnt()} label="Add Ant" />}
+        </div>
+        {renderCheckbox('edit', 'Edit')}
+        {renderCheckbox('wrap', 'Wrap')}
         {renderSelect('turnPattern', 'Turn Pattern', TurnPatterns)}
         {renderSlider('speed', 'Speed', 0, SpeedOptions.length-1)}
         {renderSlider('cellWidth', 'Cell Width', 2, 8)}

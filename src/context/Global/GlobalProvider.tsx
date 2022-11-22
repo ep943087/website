@@ -6,7 +6,7 @@ import GlobalContext, { GlobalContextInterface, ThemeType } from "./GlobalContex
 const GlobalProvider = (props: GlobalProviderProps) => {
   
   const [theme, setTheme] = useState<ThemeType>('dark');
-  const [transparentMain, setTransparentMain] = useState<boolean>(true);
+  const [transparentMain, setTransparentMain] = useState<boolean>(false);
   const [claims, setClaims] = useState<Claim[]>([]);
   const getClaim = (name: string) => claims.find(claim => claim.name === name);
   const isLoggedIn = () => claims.length > 0;

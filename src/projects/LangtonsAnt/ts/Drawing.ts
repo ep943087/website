@@ -20,12 +20,26 @@ class Drawing {
     });
   }
 
+  drawAnts() {
+    this.ctx.fillStyle = "blue";
+    this.simulation.getAnts().forEach(ant => {
+      const { x, y } = ant.getXY();
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, Simulation.ANT_RADIUS, 0, 2*Math.PI);
+      this.ctx.fill();
+    });
+  }
+
   draw = () => {
     this.ctx.fillStyle = "black";
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.drawGrid();
+    if (!this.simulation.getOptions().edit) {
+      this.drawGrid();
+    } else {
+      this.drawAnts();
+    }
   }
 }
 

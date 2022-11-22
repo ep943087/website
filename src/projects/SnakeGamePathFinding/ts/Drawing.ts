@@ -129,10 +129,17 @@ class Drawing {
   draw = () => {
     const { rows, cols } = this.simulation.getDimensions();
 
-    this.ctx.fillStyle = "blue";
-    this.canvas.width = this.canvas.offsetWidth;
-    this.canvas.height = this.canvas.offsetHeight;
+    if (this.canvas.width !== this.canvas.offsetWidth || this.canvas.height !== this.canvas.offsetHeight) {
+      this.canvas.width = this.canvas.offsetWidth;
+      this.canvas.height = this.canvas.offsetHeight;
+      this.simulation.initialize();
+      this.ctx.fillStyle = "black";
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      return;
+    }
     this.ctx.save();
+    this.ctx.fillStyle = "black";
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     const { x: gridEndX, y: gridEndY } = this.convertRowColXY(rows, cols);
@@ -146,7 +153,7 @@ class Drawing {
       this.drawFruit();
       this.drawSnake();
     }
-    //this.drawGrid();
+    this.drawGrid();
     this.ctx.restore();
   }
 }

@@ -30,7 +30,7 @@ const Layout = (props: LayoutProps) => {
         showSidebar={showSidebar}
         topNavLinks={topNavLinks}
       />
-      <BackgroundCanvas />
+      {transparentMain && <BackgroundCanvas />}
       <div className="main" style={mainStyle}>
         {props.children}
       </div>

@@ -7,7 +7,7 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   const [mySimulation, setMySimulation] = useState<Simulation>({} as Simulation);
   const [options, setOptions] = useState<SimulationOptions>(Simulation.getDefaultOptions());
 
-  const handleOptionChange = (key: SimulationOptionsKeys, value: string | string[] | number) => {
+  const handleOptionChange = (key: SimulationOptionsKeys, value: string | string[] | number | boolean) => {
     setOptions(prevOptions => ({
       ...prevOptions,
       [key]: value,
@@ -31,11 +31,35 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     const drawInterval = setInterval(drawing.draw, 0);
     const updateInterval = setInterval(simulation.update, 0);
 
-    canvas.onclick = (e: MouseEvent) => {
+    const getMouseXY = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      simulation.setStartPosition(x, y);
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    }
+
+    canvas.onmousedown = (e: MouseEvent) => {
+      if (!simulation.getOptions().edit) { return; }
+      const { x, y } = getMouseXY(e);
+      const ant = simulation.findAntWithXY(x, y);
+      if (ant) {
+        simulation.setCurrentAnt(ant);
+      }
+    }
+
+    canvas.onmousemove = (e: MouseEvent) => {
+      const { x, y } = getMouseXY(e);
+      if (simulation.getOptions().edit) {
+        const ant = simulation.getCurrentAnt();
+        if (ant) {
+          ant.setXY(x, y);
+        }
+      }
+    };
+
+    canvas.onmouseup = canvas.onmouseout = (e: MouseEvent) => {
+      simulation.setCurrentAnt(null);
     };
 
     setMySimulation(simulation);

@@ -1,15 +1,17 @@
 import Cell from "./Cell";
 import { Directions } from "../../SnakeGamePathFinding/ts/Snake";
 import { ColorPatterns, SimulationOptions, SimulationOptionsKeys, SpeedOptions } from "./types";
+import Ant from "./Ant";
 
 class Simulation {
   private grid: Cell[][] = [];
   private rows: number = 0;
   private cols: number = 0;
-  private ant: Cell = new Cell(0, 0);
-  private antDirection: Directions = Directions.DOWN;
+  private ants: Ant[] = [];
   private hueIndex = 0;
   private options: SimulationOptions = Simulation.getDefaultOptions();
+  private currentAnt: Ant | null = null;
+  public static readonly ANT_RADIUS: number = 15;
 
   constructor(private canvas: HTMLCanvasElement) {
     setTimeout(() => this.initialize(), 100);
@@ -18,10 +20,11 @@ class Simulation {
   public static getDefaultOptions(): SimulationOptions {
     return {
       turnPattern: 'RL',
-      startDirection: Directions.DOWN,
       colors: ColorPatterns,
       cellWidth: 5,
       speed: 2,
+      edit: false,
+      wrap: false,
     };
   }
 
@@ -30,6 +33,17 @@ class Simulation {
   getOptions() { return this.options; }
   getCellWidth() { return this.options.cellWidth; }
   getSpeed() { return SpeedOptions[this.options.speed]; }
+  getAnts() { return this.ants; }
+  getCurrentAnt() { return this.currentAnt; }
+  setCurrentAnt(ant: Ant | null) { this.currentAnt = ant; }
+
+  findAntWithXY(x: number, y: number) {
+    return this.ants.find(ant => {
+      const { x: antX, y: antY } = ant.getXY();
+      const distance = Math.sqrt(Math.pow(antX - x, 2) + Math.pow(antY - y, 2));
+      return distance < Simulation.ANT_RADIUS;
+    }) ?? null;
+  }
 
   setOptions(options: SimulationOptions) {
 
@@ -55,7 +69,7 @@ class Simulation {
     }
 
     this.options = options;
-    if (keyDifference === 'turnPattern' || keyDifference === 'cellWidth') {
+    if (keyDifference === 'turnPattern' || keyDifference === 'cellWidth' || keyDifference === 'edit') {
       this.initialize();
     }
   }
@@ -68,7 +82,7 @@ class Simulation {
     this.initialize();
   }
 
-  initialize(startCell?: Cell) {
+  initialize() {
     const cellWidth = this.getCellWidth();
     this.grid = [];
     this.canvas.width = this.canvas.offsetWidth;
@@ -84,8 +98,17 @@ class Simulation {
       }
       this.grid.push(gridRow);
     }
-    this.ant = startCell ?? this.grid[~~(this.rows/2)][~~(this.cols/2)];
-    this.antDirection = this.options.startDirection;
+
+    if (this.ants.length === 0) {
+      this.ants.push(new Ant(this.canvas.width/2, this.canvas.height/2));
+    }
+
+    this.ants.forEach(ant => {
+      const { x, y } = ant.getXY();
+      const { row, col } = this.convertXYToRowCol(x, y);
+      ant.setCell(this.grid[row][col]);
+      ant.setDirection(ant.getStartDirection());
+    });
   }
 
   convertRowColToXY(row: number, col: number) {
@@ -104,44 +127,48 @@ class Simulation {
     };
   };
 
-  setStartPosition(x: number, y: number) {
-    const { row, col } = this.convertXYToRowCol(x, y);
-    this.initialize(this.grid[row][col]);
-  }
-
-  getGridCell(row: number, col: number): Cell {
+  getGridCell(row: number, col: number): Cell | null {
     let r = row;
     r = r < 0 ? this.rows-1 : r;
     r = r >= this.rows ? 0 : r;
     let c = col;
     c = c < 0 ? this.cols-1 : c;
     c = c >= this.cols ? 0 : c;
+    if (!this.options.wrap && (r !== row || c !== col)) {
+      return null;
+    }
     return this.grid[r][c];
   }
 
-  getNextBackWardCell() {
-    const row = this.ant.getRow();
-    const col = this.ant.getCol();
-    switch (this.antDirection) {
+  getNextBackWardCell(ant: Ant) {
+    const cell = ant.getCell();
+    if (!cell) return cell;
+    const row = cell.getRow();
+    const col = cell.getCol();
+
+    switch (ant.getDirection()) {
       case Directions.UP:
-        this.antDirection = Directions.DOWN;
+        ant.setDirection(Directions.DOWN);
         return this.getGridCell(row+1, col);
       case Directions.DOWN:
-        this.antDirection = Directions.UP;
+        ant.setDirection(Directions.UP);
         return this.getGridCell(row-1, col);
       case Directions.RIGHT:
-        this.antDirection = Directions.LEFT;
+        ant.setDirection(Directions.LEFT);
         return this.getGridCell(row, col-1);
       case Directions.LEFT:
-        this.antDirection = Directions.RIGHT;
+        ant.setDirection(Directions.RIGHT);
         return this.getGridCell(row, col+1);
     }
   }
 
-  getNextForwardCell() {
-    const row = this.ant.getRow();
-    const col = this.ant.getCol();
-    switch (this.antDirection) {
+  getNextForwardCell(ant: Ant) {
+    const cell = ant.getCell();
+    if (!cell) return cell;
+    const row = cell.getRow();
+    const col = cell.getCol();
+    
+    switch (ant.getDirection()) {
       case Directions.UP:
         return this.getGridCell(row-1, col);
       case Directions.DOWN:
@@ -153,60 +180,75 @@ class Simulation {
     }
   }
 
-  getNextRightCell() {
-    const row = this.ant.getRow();
-    const col = this.ant.getCol();
-    switch (this.antDirection) {
+  getNextRightCell(ant: Ant) {
+    const cell = ant.getCell();
+    if (!cell) return cell;
+    const row = cell.getRow();
+    const col = cell.getCol();
+    switch (ant.getDirection()) {
       case Directions.UP:
-        this.antDirection = Directions.RIGHT;
+        ant.setDirection(Directions.RIGHT);
         return this.getGridCell(row, col+1);
       case Directions.DOWN:
-        this.antDirection = Directions.LEFT;
+        ant.setDirection(Directions.LEFT);
         return this.getGridCell(row, col-1);
       case Directions.RIGHT:
-        this.antDirection = Directions.DOWN;
+        ant.setDirection(Directions.DOWN);
         return this.getGridCell(row+1, col);
       case Directions.LEFT:
-        this.antDirection = Directions.UP;
+        ant.setDirection(Directions.UP);
         return this.getGridCell(row-1, col);
     }
   }
 
-  getNextLeftCell() {
-    const row = this.ant.getRow();
-    const col = this.ant.getCol();
+  getNextLeftCell(ant: Ant) {
+    const cell = ant.getCell();
+    if (!cell) return cell;
+    const row = cell.getRow();
+    const col = cell.getCol();
 
-    switch (this.antDirection) {
+    switch (ant.getDirection()) {
       case Directions.UP:
-        this.antDirection = Directions.LEFT;
+        ant.setDirection(Directions.LEFT)
         return this.getGridCell(row, col-1);
       case Directions.DOWN:
-        this.antDirection = Directions.RIGHT;
+        ant.setDirection(Directions.RIGHT);
         return this.getGridCell(row, col+1);
       case Directions.RIGHT:
-        this.antDirection = Directions.UP;
+        ant.setDirection(Directions.UP)
         return this.getGridCell(row-1, col);
       case Directions.LEFT:
-        this.antDirection = Directions.DOWN;
+        ant.setDirection(Directions.DOWN);
         return this.getGridCell(row+1, col);
     }
   }
 
-  getNextCell(turn: string) {
+  getNextCell(ant: Ant, turn: string) {
     switch (turn) {
-      case 'L': return this.getNextLeftCell();
-      case 'R': return this.getNextRightCell();
-      case 'F': return this.getNextForwardCell();
-      case 'B': return this.getNextBackWardCell();
-      default: return this.getNextForwardCell();
+      case 'L': return this.getNextLeftCell(ant);
+      case 'R': return this.getNextRightCell(ant);
+      case 'F': return this.getNextForwardCell(ant);
+      case 'B': return this.getNextBackWardCell(ant);
+      default: return this.getNextForwardCell(ant);
     }
   }
 
   updateIteration() {
-    const currentIndex = this.options.colors.findIndex(color => color === this.ant.getColor());
-    const nextColorIndex = (currentIndex + 1) % this.options.turnPattern.length;
-    this.ant.setColor(this.options.colors[nextColorIndex]);
-    this.ant = this.getNextCell(this.options.turnPattern[currentIndex]);
+    this.ants.forEach(ant => {
+      const cell = ant.getCell();
+      if (cell) {
+        const currentIndex = this.options.colors.findIndex(color => color === cell.getColor());
+        const nextColorIndex = (currentIndex + 1) % this.options.turnPattern.length;
+        cell.setColor(this.options.colors[nextColorIndex]);
+        const next = this.getNextCell(ant, this.options.turnPattern[currentIndex]);
+        ant.setCell(next);
+      }
+    });
+  }
+
+  addAnt() {
+    const [x, y] = [Math.random()*this.canvas.width, Math.random()*this.canvas.height];
+    this.ants.push(new Ant(x, y));
   }
 
   getHSLColor() {
@@ -219,7 +261,7 @@ class Simulation {
   }
 
   update = () => {
-    if (this.grid.length === 0) { return; }
+    if (this.grid.length === 0 || this.options.edit) { return; }
     for (let i=0;i<this.getSpeed();i++) {
       this.updateIteration();
     }
