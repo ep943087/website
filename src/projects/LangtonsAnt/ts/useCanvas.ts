@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Drawing from "./Drawing";
 import Simulation from "./Simulation";
-import { SimulationOptions, SimulationOptionsKeys } from "./types";
+import { SimulationOptions, SimulationOptionsKeys, TurnPatterns } from "./types";
 
 const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
   const [mySimulation, setMySimulation] = useState<Simulation>({} as Simulation);
@@ -23,6 +23,20 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     mySimulation.initialize();
   }
 
+  const getCurrentPatternIndex = () => TurnPatterns.findIndex(pattern => pattern.value === options.turnPattern);
+
+  const handlePreviousPatternClicked = () => {
+    const currentPatternIndex = getCurrentPatternIndex();
+    const previousPatternIndex = currentPatternIndex > 0 ? currentPatternIndex - 1 : TurnPatterns.length - 1;
+    handleOptionChange('turnPattern', TurnPatterns[previousPatternIndex].value);
+  };
+
+  const handleNextPatternClicked = () => {
+    const currentPatternIndex = getCurrentPatternIndex();
+    const nextPatternIndex = currentPatternIndex < TurnPatterns.length-1 ? currentPatternIndex + 1 : 0;
+    handleOptionChange('turnPattern', TurnPatterns[nextPatternIndex].value);
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current as HTMLCanvasElement;
     const simulation = new Simulation(canvas);
@@ -39,27 +53,50 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
       };
     }
 
-    canvas.onmousedown = (e: MouseEvent) => {
-      if (!simulation.getOptions().edit) { return; }
-      const { x, y } = getMouseXY(e);
-      const ant = simulation.findAntWithXY(x, y);
-      if (ant) {
-        simulation.setCurrentAnt(ant);
-      }
-    }
-
-    canvas.onmousemove = (e: MouseEvent) => {
-      const { x, y } = getMouseXY(e);
-      if (simulation.getOptions().edit) {
-        const ant = simulation.getCurrentAnt();
-        if (ant) {
-          ant.setXY(x, y);
-        }
-      }
+    const getTouchXY = (e: TouchEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top,
+      };
     };
 
-    canvas.onmouseup = canvas.onmouseout = (e: MouseEvent) => {
-      simulation.setCurrentAnt(null);
+    canvas.onmousedown = (e: MouseEvent) => {
+      const mouse = getMouseXY(e);
+      simulation.handleMouseDown(mouse);
+    }
+
+    canvas.ontouchstart = (e: TouchEvent) => {
+      e.preventDefault();
+      const mouse = getTouchXY(e);
+      simulation.handleMouseDown(mouse);
+    };
+
+    canvas.onmousemove = (e: MouseEvent) => {
+      const mouse = getMouseXY(e);
+      simulation.handleMouseMove(mouse);
+    };
+
+    canvas.ontouchmove = (e: TouchEvent) => {
+      e.preventDefault();
+      const mouse = getTouchXY(e);
+      simulation.handleMouseMove(mouse);
+    };
+
+    canvas.onmouseup = () => {
+      simulation.handleMouseUp();
+    };
+
+    canvas.ontouchend = () => {
+      simulation.handleMouseUp();
+    };
+
+    canvas.ontouchcancel = () => {
+      simulation.handleMouseOut();
+    };
+
+    canvas.onmouseout = () => {
+      simulation.handleMouseOut();
     };
 
     setMySimulation(simulation);
@@ -76,6 +113,8 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     handleResetClicked,
     options,
     handleOptionChange,
+    handleNextPatternClicked,
+    handlePreviousPatternClicked,
   };
 };
 

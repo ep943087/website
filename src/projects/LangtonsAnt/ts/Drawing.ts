@@ -1,12 +1,16 @@
+import { Directions } from "../../SnakeGamePathFinding/ts/Snake";
 import Simulation from "./Simulation";
 
 class Drawing {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
+  private antImage: HTMLImageElement;
 
   constructor(private simulation: Simulation) {
     this.canvas = this.simulation.getCanvas();
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+    this.antImage = new Image();
+    this.antImage.src = '/ant.png';
   }
 
   drawGrid() {
@@ -22,11 +26,22 @@ class Drawing {
 
   drawAnts() {
     this.ctx.fillStyle = "blue";
+    const width = Simulation.ANT_RADIUS;
+    const halfWidth = Simulation.ANT_RADIUS/2;
+
     this.simulation.getAnts().forEach(ant => {
       const { x, y } = ant.getXY();
-      this.ctx.beginPath();
-      this.ctx.arc(x, y, Simulation.ANT_RADIUS, 0, 2*Math.PI);
-      this.ctx.fill();
+      this.ctx.save();
+      this.ctx.setTransform(1, 0, 0, 1, x, y);
+      if (ant.getStartDirection() === Directions.DOWN) {
+        this.ctx.rotate(Math.PI);
+      } else if (ant.getStartDirection() === Directions.LEFT) {
+        this.ctx.rotate(3*Math.PI/2);
+      } else if (ant.getStartDirection() === Directions.RIGHT) {
+        this.ctx.rotate(Math.PI/2);
+      }
+      this.ctx.drawImage(this.antImage, -halfWidth, -halfWidth, width, width);
+      this.ctx.restore();
     });
   }
 

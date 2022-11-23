@@ -11,7 +11,8 @@ class Simulation {
   private hueIndex = 0;
   private options: SimulationOptions = Simulation.getDefaultOptions();
   private currentAnt: Ant | null = null;
-  public static readonly ANT_RADIUS: number = 15;
+  private movedMouse: boolean = false;
+  public static readonly ANT_RADIUS: number = 60;
 
   constructor(private canvas: HTMLCanvasElement) {
     setTimeout(() => this.initialize(), 100);
@@ -21,10 +22,10 @@ class Simulation {
     return {
       turnPattern: 'RL',
       colors: ColorPatterns,
-      cellWidth: 5,
+      cellWidth: 4,
       speed: 2,
       edit: false,
-      wrap: false,
+      wrap: true,
     };
   }
 
@@ -36,6 +37,8 @@ class Simulation {
   getAnts() { return this.ants; }
   getCurrentAnt() { return this.currentAnt; }
   setCurrentAnt(ant: Ant | null) { this.currentAnt = ant; }
+  getMovedMouse() { return this.movedMouse; }
+  setMovedMouse(movedMouse: boolean) { this.movedMouse = movedMouse; }
 
   findAntWithXY(x: number, y: number) {
     return this.ants.find(ant => {
@@ -260,6 +263,47 @@ class Simulation {
     return `hsl(${hue}, 50%, 50%)`;
   }
 
+  removeAnt(antToRemove: Ant) {
+    this.ants = this.ants.filter(ant => ant !== antToRemove);
+  }
+
+  handleMouseDown(mouse: Point) {
+    if (!this.getOptions().edit) { return; }
+    const { x, y } = mouse;
+    const ant = this.findAntWithXY(x, y);
+    if (ant) {
+      this.setMovedMouse(false);
+      this.setCurrentAnt(ant);
+    }
+  }
+
+  handleMouseMove(mouse: Point) {
+    const { x, y } = mouse;
+    if (this.getOptions().edit) {
+      const ant = this.getCurrentAnt();
+      if (ant) {
+        this.setMovedMouse(true);
+        ant.setXY(x, y);
+      }
+    }
+  }
+
+  handleMouseUp() {
+    const currentAnt = this.getCurrentAnt();
+    if (currentAnt && !this.getMovedMouse()) {
+      currentAnt.rotateLeft();
+    }
+    this.setCurrentAnt(null);
+  }
+
+  handleMouseOut() {
+    const currentAnt = this.getCurrentAnt();
+    if (currentAnt !== null) {
+      this.removeAnt(currentAnt);
+    }
+    this.setCurrentAnt(null);
+  }
+
   update = () => {
     if (this.grid.length === 0 || this.options.edit) { return; }
     for (let i=0;i<this.getSpeed();i++) {
@@ -267,5 +311,7 @@ class Simulation {
     }
   }
 }
+
+interface Point { x: number, y: number };
 
 export default Simulation;

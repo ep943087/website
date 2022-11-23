@@ -18,6 +18,22 @@ class Ant {
   getXY() { return { x: this.x, y: this.y, }}
   setXY(x: number, y: number) { this.x = x; this.y = y; }
   getIsDead() { return this.cell === null; }
+  rotateLeft() {
+    switch (this.startDirection) {
+      case Directions.UP:
+        this.startDirection = Directions.LEFT;
+        break;
+      case Directions.LEFT:
+        this.startDirection = Directions.DOWN;
+        break;
+      case Directions.DOWN:
+        this.startDirection = Directions.RIGHT;
+        break;
+      case Directions.RIGHT:
+        this.startDirection = Directions.UP;
+        break;
+    }
+  }
 }
 
 export default Ant;

@@ -62,7 +62,10 @@ const ColorWrapperStyle = styled.div`
 const LangtonsAnt = () => {
 
   const canvasRef = createRef<HTMLCanvasElement>();
-  const { handleResetClicked, options, handleOptionChange, simulation } = useCanvas(canvasRef);
+  const {
+    handleResetClicked, options, handleOptionChange, simulation,
+    handleNextPatternClicked, handlePreviousPatternClicked,
+  } = useCanvas(canvasRef);
 
   const handleColorChange = (newColor: string, index: number) => {
     const newColors = [...options.colors];
@@ -110,9 +113,13 @@ const LangtonsAnt = () => {
         </div>
         {renderCheckbox('edit', 'Edit')}
         {renderCheckbox('wrap', 'Wrap')}
+        <div>
+          <Button onClick={handlePreviousPatternClicked} label="&lt;" />
+          <Button onClick={handleNextPatternClicked} label="&gt;" />
+        </div>
         {renderSelect('turnPattern', 'Turn Pattern', TurnPatterns)}
         {renderSlider('speed', 'Speed', 0, SpeedOptions.length-1)}
-        {renderSlider('cellWidth', 'Cell Width', 2, 8)}
+        {renderSlider('cellWidth', 'Cell Width', 1, 8)}
         <ColorWrapperStyle>
           {options.turnPattern.split('').map((_, index) => {
             if (index === 0) {
