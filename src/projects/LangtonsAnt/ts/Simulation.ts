@@ -249,8 +249,8 @@ class Simulation {
     });
   }
 
-  addAnt() {
-    const [x, y] = [Math.random()*this.canvas.width, Math.random()*this.canvas.height];
+  addAnt(mouse?: Point) {
+    const [x, y] = mouse ? [mouse.x, mouse.y] : [Math.random()*this.canvas.width, Math.random()*this.canvas.height];
     this.ants.push(new Ant(x, y));
   }
 
@@ -288,10 +288,13 @@ class Simulation {
     }
   }
 
-  handleMouseUp() {
+  handleMouseUp(mouse: Point) {
     const currentAnt = this.getCurrentAnt();
     if (currentAnt && !this.getMovedMouse()) {
       currentAnt.rotateLeft();
+    }
+    if (this.options.edit && !currentAnt) {
+      this.addAnt(mouse);
     }
     this.setCurrentAnt(null);
   }

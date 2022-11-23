@@ -73,6 +73,7 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     };
 
     canvas.onmousemove = (e: MouseEvent) => {
+      e.preventDefault();
       const mouse = getMouseXY(e);
       simulation.handleMouseMove(mouse);
     };
@@ -83,19 +84,25 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
       simulation.handleMouseMove(mouse);
     };
 
-    canvas.onmouseup = () => {
-      simulation.handleMouseUp();
+    canvas.onmouseup = (e: MouseEvent) => {
+      e.preventDefault();
+      const mouse = getMouseXY(e);
+      simulation.handleMouseUp(mouse);
     };
 
-    canvas.ontouchend = () => {
-      simulation.handleMouseUp();
+    canvas.ontouchend = (e: TouchEvent) => {
+      e.preventDefault();
+      const mouse = getTouchXY(e);
+      simulation.handleMouseUp(mouse);
     };
 
-    canvas.ontouchcancel = () => {
+    canvas.ontouchcancel = (e: TouchEvent) => {
+      e.preventDefault();
       simulation.handleMouseOut();
     };
 
-    canvas.onmouseout = () => {
+    canvas.onmouseout = (e: MouseEvent) => {
+      e.preventDefault();
       simulation.handleMouseOut();
     };
 
