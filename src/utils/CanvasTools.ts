@@ -24,6 +24,13 @@ class CanvasTools {
     }
     ctx.fillRect(x+1, y+1, width-2, height-2);
   }
+
+  public static drawRectFromCenter(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, color?: string) {
+    if (color ) {
+      ctx.fillStyle = color;
+    }
+    ctx.fillRect(x-width/2, y-height/2, width, height);
+  }
 };
 
 export default CanvasTools;

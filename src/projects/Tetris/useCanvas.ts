@@ -18,28 +18,28 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
       if (simulation.getGameOver()) {
         return;
       }
-      
-      if (e.key === 'a') {
+      e.preventDefault();
+      if (e.key === 'a' || e.key === 'ArrowLeft') {
         if (current.canMoveLeft()) {
           current.moveLeft();
         }
-      } else if (e.key === 'd') {
+      } else if (e.key === 'd' || e.key === 'ArrowRight') {
         if (current.canMoveRight()) {
           current.moveRight();
         }
-      } else if (e.key === 's') {
+      } else if (e.key === 's' || e.key === 'ArrowDown') {
         if (current.canMoveDown()) {
           current.moveDown();
           simulation.resetMoveDownDelay();
         }
-      } else if (e.key === 'w') {
+      } else if (e.key === 'w' || e.key === 'ArrowUp') {
         while (current.canMoveDown()) {
           current.moveDown();
         }
         simulation.addCurrentCellToGrid();
-      } else if (e.key === 'j') {
+      } else if (e.key === 'j' || e.key === 'x') {
         current.rotateLeft();
-      } else if (e.key === 'k') {
+      } else if (e.key === 'k' || e.key === 'c') {
         current.rotateRight();
       }
     };

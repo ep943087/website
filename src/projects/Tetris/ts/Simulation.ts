@@ -1,4 +1,5 @@
 import AbstractTetromino from "./AbstractTetromino";
+import ExplodingCell from "./ExplodingCell";
 import Grid from "./Grid";
 import TetrominoI from "./TetrominoI";
 import TetrominoJ from "./TetrominoJ";
@@ -22,6 +23,7 @@ class Simulation
   private score: number = 0;
   private highScore: number = 0;
   private static readonly TETRIS_HIGH_SCORE_KEY = 'tetrisHighScore';
+  private explodingCells: ExplodingCell[] = [];
 
   constructor(private canvas: HTMLCanvasElement) {
     const highScore = localStorage.getItem(Simulation.TETRIS_HIGH_SCORE_KEY);
@@ -37,6 +39,11 @@ class Simulation
   getRowsCleared() { return this.rowsCleared }
   getScore() { return this.score }
   getHighScore() { return this.highScore }
+  getExplodingCells() { return this.explodingCells }
+
+  getCellLength() {
+    return 25;
+  }
 
   checkHighScore() {
     this.highScore = Math.max(this.highScore, this.score);
@@ -54,6 +61,7 @@ class Simulation
     this.nextTetromino = this.getRandomTetromino();
     this.gameOver = false;
     this.score = 0;
+    this.explodingCells = [];
   }
 
   setRowsCleared() {
@@ -149,11 +157,10 @@ class Simulation
     const matrix = this.getGridMatrix();
     this.rowsCleared.forEach((row, index) => {
       const matrixRow = [...matrix[row]];
-      if (index % 2 === 1) {
-        matrixRow.reverse();
-      }
       matrixRow.some(cell => {
         if (cell.getIsFilled()) {
+          const explodingCell = new ExplodingCell(cell.getRow(), cell.getCol()+5, this.getCellLength(), cell.getColor());
+          this.explodingCells.push(explodingCell);
           cell.setIsFilled(false);
           cell.setColor("");
           return true;
@@ -164,6 +171,12 @@ class Simulation
   }
 
   update = () => {
+    for (let i=this.explodingCells.length-1;i>=0;i--) {
+      this.explodingCells[i].update();
+      if (this.explodingCells[i].lifeSpanOver()) {
+        this.explodingCells.splice(i, 1);
+      }
+    }
     if (this.rowsCleared.length > 0) {
       if (!this.rowsAreCleared()) {
         if (this.clearCellDelay === Simulation.CLEAR_CELL_DELAY_MAX) {

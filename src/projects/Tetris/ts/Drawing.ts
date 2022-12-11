@@ -5,18 +5,15 @@ import Simulation from "./Simulation";
 class Drawing {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
-
+  private static readonly BACKGROUND_COLOR = "black";
+  private static readonly GRID_COLOR = "white";
   constructor(private simulation: Simulation) {
     this.canvas = simulation.getCanvas();
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
   }
 
-  getCellLength() {
-    return 25;
-  }
-
   getXYByRowCol(row: number, col: number) {
-    return { x: (col+5) * this.getCellLength(), y: row * this.getCellLength()};
+    return { x: (col+5) * this.simulation.getCellLength(), y: row * this.simulation.getCellLength()};
   }
 
   drawGrid() {
@@ -32,10 +29,11 @@ class Drawing {
   }
 
   drawCell(row: number, col: number, color: string, drawOutline: boolean, drawOutlineAlways: boolean = false) {
-    const cellLength = this.getCellLength();
+    const cellLength = this.simulation.getCellLength();
     const matrix = this.simulation.getGridMatrix();
     const { x, y } = this.getXYByRowCol(row, col);
-    this.ctx.strokeStyle = "black";
+    this.ctx.lineWidth = .5;
+    this.ctx.strokeStyle = Drawing.GRID_COLOR;
     if (color !== '') {
       this.ctx.strokeStyle = "gray";
       this.ctx.fillStyle = color;
@@ -82,7 +80,7 @@ class Drawing {
   }
 
   drawScores() {
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = Drawing.GRID_COLOR;
     this.ctx.textAlign = "left";
     this.ctx.font = "16px Monospace";
     this.ctx.textBaseline = "top";
@@ -90,11 +88,19 @@ class Drawing {
     this.ctx.fillText(`Score: ${this.simulation.getScore()}`, 395, 40);
   }
 
+  drawExplodingPieces() {
+    this.simulation.getExplodingCells().forEach(cell => {
+      cell.getExplodingCells().forEach(piece => {
+        CanvasTools.drawRectFromCenter(this.ctx, piece.getX(), piece.getY(), 3, 8, cell.getColor());
+      });
+    });
+  }
+
   draw = () => {
     this.canvas.width = this.canvas.offsetWidth;
     this.canvas.height = this.canvas.offsetHeight;
     
-    this.ctx.fillStyle = "white";
+    this.ctx.fillStyle = Drawing.BACKGROUND_COLOR;
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
@@ -104,6 +110,7 @@ class Drawing {
       this.drawCurrentTetromino();
     }
     this.drawGrid();
+    this.drawExplodingPieces();
     this.drawScores();
   }
 };
