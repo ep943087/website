@@ -52,8 +52,8 @@ export const gameProjects: ProjectType[] = [
   },
   {
     imageURL: '/tetris.png',
-    linkURL: 'http://ada.cameron.edu/~ep943087/practice/tetris/',
-    externalLink: true,
+    linkURL: '/projects/tetris',
+    externalLink: false,
     caption: 'Tetris',
   },
   {

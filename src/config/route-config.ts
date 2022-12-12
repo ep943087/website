@@ -6,6 +6,7 @@ import LangtonsAnt from "../projects/LangtonsAnt/LangtonsAnt";
 import MazeGeneration from "../projects/MazeGeneration/MazeGeneration";
 import Particles from "../projects/Particles/Particles";
 import SnakeGamePathFinding from "../projects/SnakeGamePathFinding/SnakeGamePathFinding";
+import Tetris from "../projects/Tetris/Tetris";
 
 const routeConfig: Route[] = [
   { path: '/register', component: RegisterPage },
@@ -16,6 +17,7 @@ const routeConfig: Route[] = [
   { path: '/projects/maze-generation', component: MazeGeneration },
   { path: '/projects/particles', component: Particles },
   { path: '/projects/langtons-ant', component: LangtonsAnt },
+  { path: '/projects/tetris', component: Tetris },
 
   { path: "/", component: LandingPage },
 ];
