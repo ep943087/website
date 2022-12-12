@@ -1,5 +1,5 @@
 class ExplodingCell {
-  private static readonly NUMBER_OF_BALLS = 10;
+  private static readonly NUMBER_OF_BALLS = 6;
   private static readonly LIFE_SPAN = 100;
   private lifeSpanCount = 0;
   private explodingCellPieces: ExplodingCellPiece[] = [];
@@ -28,7 +28,7 @@ class ExplodingCell {
 };
 
 class ExplodingCellPiece {
-  private static readonly VELOCITY = 40;
+  private static readonly VELOCITY = 28;
   private xVel: number;
   private yVel: number;
 
@@ -45,7 +45,7 @@ class ExplodingCellPiece {
     this.x += this.xVel;
     this.y += this.yVel;
 
-    this.yVel += 4;
+    this.yVel += 3;
   }
 }
 

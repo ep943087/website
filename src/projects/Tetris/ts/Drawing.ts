@@ -13,7 +13,7 @@ class Drawing {
   }
 
   getXYByRowCol(row: number, col: number) {
-    return { x: (col+5) * this.simulation.getCellLength(), y: row * this.simulation.getCellLength()};
+    return { x: (col+1) * this.simulation.getCellLength(), y: row * this.simulation.getCellLength()};
   }
 
   drawGrid() {
@@ -84,16 +84,26 @@ class Drawing {
     this.ctx.textAlign = "left";
     this.ctx.font = "16px Monospace";
     this.ctx.textBaseline = "top";
-    this.ctx.fillText(`High Score: ${this.simulation.getHighScore()}`, 395, 10);
-    this.ctx.fillText(`Score: ${this.simulation.getScore()}`, 395, 40);
+    this.ctx.fillText(`High: ${this.simulation.getHighScore()}`, 295, 40);
+    this.ctx.fillText(`Score: ${this.simulation.getScore()}`, 295, 10);
   }
 
   drawExplodingPieces() {
     this.simulation.getExplodingCells().forEach(cell => {
       cell.getExplodingCells().forEach(piece => {
-        CanvasTools.drawRectFromCenter(this.ctx, piece.getX(), piece.getY(), 3, 8, cell.getColor());
+        CanvasTools.drawRectFromCenter(this.ctx, piece.getX(), piece.getY(), 4, 4, cell.getColor());
       });
     });
+  }
+
+  drawPaused() {
+    const [cx, cy] = [this.canvas.width/2, this.canvas.height/2];
+    CanvasTools.drawRectFromCenter(this.ctx, cx, cy, 120, 40, 'white');
+    this.ctx.fillStyle = "red";
+    this.ctx.font = "30px Monospace";
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.ctx.fillText("Paused", cx, cy);
   }
 
   draw = () => {
@@ -112,6 +122,10 @@ class Drawing {
     this.drawGrid();
     this.drawExplodingPieces();
     this.drawScores();
+
+    if (this.simulation.getPaused()) {
+      this.drawPaused();
+    }
   }
 };
 

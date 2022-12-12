@@ -24,6 +24,7 @@ class Simulation
   private highScore: number = 0;
   private static readonly TETRIS_HIGH_SCORE_KEY = 'tetrisHighScore';
   private explodingCells: ExplodingCell[] = [];
+  private paused: boolean = false;
 
   constructor(private canvas: HTMLCanvasElement) {
     const highScore = localStorage.getItem(Simulation.TETRIS_HIGH_SCORE_KEY);
@@ -40,6 +41,11 @@ class Simulation
   getScore() { return this.score }
   getHighScore() { return this.highScore }
   getExplodingCells() { return this.explodingCells }
+  getPaused() { return this.paused }
+
+  togglePaused() {
+    this.paused = !this.paused;
+  }
 
   getCellLength() {
     return 25;
@@ -62,6 +68,7 @@ class Simulation
     this.gameOver = false;
     this.score = 0;
     this.explodingCells = [];
+    this.paused = false;
   }
 
   setRowsCleared() {
@@ -118,9 +125,12 @@ class Simulation
         matrix[piece.getRow()][piece.getCol()].setColor(piece.getColor());
       } else {
         this.gameOver = true;
-        this.reset();
       }
     });
+    if (this.gameOver) {
+      this.reset();
+      return;
+    }
     this.setRowsCleared();
     this.currentTetromino = this.nextTetromino;
     this.nextTetromino = this.getRandomTetromino();
@@ -159,7 +169,7 @@ class Simulation
       const matrixRow = [...matrix[row]];
       matrixRow.some(cell => {
         if (cell.getIsFilled()) {
-          const explodingCell = new ExplodingCell(cell.getRow(), cell.getCol()+5, this.getCellLength(), cell.getColor());
+          const explodingCell = new ExplodingCell(cell.getRow(), cell.getCol()+1, this.getCellLength(), cell.getColor());
           this.explodingCells.push(explodingCell);
           cell.setIsFilled(false);
           cell.setColor("");
@@ -171,6 +181,10 @@ class Simulation
   }
 
   update = () => {
+    if (this.paused) {
+      return;
+    }
+
     for (let i=this.explodingCells.length-1;i>=0;i--) {
       this.explodingCells[i].update();
       if (this.explodingCells[i].lifeSpanOver()) {

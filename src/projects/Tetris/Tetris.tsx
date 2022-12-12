@@ -7,6 +7,8 @@ import useCanvas from "./useCanvas";
 const CanvasStyle = styled.canvas`
   width: 100%;
   height: 500px;
+  max-width: 500px;
+  margin: 0 auto;
 `;
 
 const Tetris = () => {
@@ -15,7 +17,7 @@ const Tetris = () => {
   useCanvas(canvasRef);
 
   return (
-    <Page>
+    <Page flexColumn>
       <Typography variant="title" textAlign="center">Tetris</Typography>
       <CanvasStyle ref={canvasRef} />
     </Page>

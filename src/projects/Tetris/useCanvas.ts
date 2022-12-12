@@ -19,6 +19,15 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
         return;
       }
       e.preventDefault();
+
+      if (e.key === 'p') {
+        simulation.togglePaused();
+      }
+
+      if (simulation.getPaused()) {
+        return;
+      }
+
       if (e.key === 'a' || e.key === 'ArrowLeft') {
         if (current.canMoveLeft()) {
           current.moveLeft();
