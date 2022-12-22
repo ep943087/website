@@ -5,6 +5,7 @@ import RegisterPage from "../pages/RegisterPage/RegisterPage";
 import LangtonsAnt from "../projects/LangtonsAnt/LangtonsAnt";
 import MazeGeneration from "../projects/MazeGeneration/MazeGeneration";
 import Particles from "../projects/Particles/Particles";
+import SijaluRun from "../projects/SijaluRun/SijaluRun";
 import SnakeGamePathFinding from "../projects/SnakeGamePathFinding/SnakeGamePathFinding";
 import Tetris from "../projects/Tetris/Tetris";
 
@@ -18,6 +19,7 @@ const routeConfig: Route[] = [
   { path: '/projects/particles', component: Particles },
   { path: '/projects/langtons-ant', component: LangtonsAnt },
   { path: '/projects/tetris', component: Tetris },
+  { path: '/projects/sijalu-run', component: SijaluRun },
 
   { path: "/", component: LandingPage },
 ];

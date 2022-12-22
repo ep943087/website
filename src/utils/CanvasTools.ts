@@ -31,6 +31,11 @@ class CanvasTools {
     }
     ctx.fillRect(x-width/2, y-height/2, width, height);
   }
+
+  public static addLeadingZeroesToNumber(num: number, leadingZeroes: number): string {
+    const zeroes: string = Array(leadingZeroes).fill('0').join('');
+    return (zeroes+num.toString()).slice(-leadingZeroes);
+  }
 };
 
 export default CanvasTools;
