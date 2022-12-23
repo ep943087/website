@@ -9,28 +9,37 @@ const useCanvas = (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     const simulation = new Simulation(canvas);
     const drawing = new Drawing(simulation);
 
+    canvas.onmousedown = (e: MouseEvent) => {
+      e.preventDefault();
+      simulation.handleJumpEvent();
+    };
+
+    canvas.onmouseout = canvas.onmouseup = (e: MouseEvent) => {
+      e.preventDefault();
+      simulation.handleStopJumpEvent();
+    };
+
+    canvas.ontouchstart = (e: TouchEvent) => {
+      e.preventDefault();
+      simulation.handleJumpEvent();
+    };
+
+    canvas.ontouchcancel = canvas.ontouchend = (e: TouchEvent) => {
+      e.preventDefault();
+      simulation.handleStopJumpEvent();
+    };
+
     document.onkeydown = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.key === ' ') {
-        const sijalu = simulation.getSijalu();
-
-        if (sijalu.getIsDead()) {
-          simulation.reset();
-          return;
-        }
-
-        if (!sijalu.getIsJumping()) {
-          sijalu.setIsMouseDown(true);
-        }
-        sijalu.jump();
+        simulation.handleJumpEvent();
       }
     }
 
     document.onkeyup = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.key === ' ') {
-        const sijalu = simulation.getSijalu();
-        sijalu.setIsMouseDown(false);
+        simulation.handleStopJumpEvent();
       }
     }
 

@@ -2,20 +2,20 @@ import CanvasImage from "../../../utils/CanvasImage";
 import Enemy from "./Enemy";
 import Simulation from "./Simulation";
 
-class Maya extends Enemy {
+class Elias extends Enemy {
 
-  private static Image: CanvasImage = new CanvasImage('/maya.png', 100, 54);
+  private static Image: CanvasImage = new CanvasImage('/elias.png', 60, 120);
 
   constructor() {
     super();
-    this.width = 80;
-    this.height = 54;
+    this.width = 50;
+    this.height = 100;
     this.y = Simulation.getInitialY(this.height);
   }
 
   getImage() {
-    return Maya.Image;
+    return Elias.Image;
   }
 };
 
-export default Maya;
+export default Elias;

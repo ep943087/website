@@ -12,20 +12,24 @@ class Drawing {
 
   drawSijalu() {
     const sijalu = this.simulation.getSijalu();
-    CanvasTools.drawRectFromCenter(this.ctx, sijalu.getX(), sijalu.getY(), sijalu.getWidth(), sijalu.getHeight(), 'blue');
+    const image = sijalu.getImage();
+    CanvasTools.drawImageFromCenter(this.ctx, image.getImage(), sijalu.getX(), sijalu.getY(), image.getWidth(), image.getHeight());
+    //CanvasTools.drawRectFromCenter(this.ctx, sijalu.getX(), sijalu.getY(), sijalu.getWidth(), sijalu.getHeight(), 'red', false);
   }
 
   drawEnemies() {
     this.simulation.getEnemies().forEach(enemy => {
-      CanvasTools.drawRectFromCenter(this.ctx, enemy.getX(), enemy.getY(), enemy.getWidth(), enemy.getHeight(), 'red');
+      const image = enemy.getImage();
+      CanvasTools.drawImageFromCenter(this.ctx, image.getImage(), enemy.getX(), enemy.getY(), image.getWidth(), image.getHeight());
+      //CanvasTools.drawRectFromCenter(this.ctx, enemy.getX(), enemy.getY(), enemy.getWidth(), enemy.getHeight(), 'blue', false);
     });
   }
   
   drawGround() {
     this.ctx.strokeStyle = "black";
     this.ctx.beginPath();
-    this.ctx.moveTo(0, Simulation.BOTTOM_LINE - 10);
-    this.ctx.lineTo(this.canvas.width, Simulation.BOTTOM_LINE - 10);
+    this.ctx.moveTo(0, Simulation.BOTTOM_LINE - 20);
+    this.ctx.lineTo(this.canvas.width, Simulation.BOTTOM_LINE - 20);
     this.ctx.stroke();
   }
 

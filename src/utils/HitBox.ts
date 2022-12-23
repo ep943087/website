@@ -1,4 +1,4 @@
-abstract class HitBox {
+class HitBox {
   protected x: number = 0;
   protected y: number = 0;
   protected width: number = 0;

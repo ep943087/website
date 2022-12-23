@@ -1,3 +1,4 @@
+import Elias from "./Elias";
 import Enemy from "./Enemy";
 import Maya from "./Maya";
 import Sijalu from "./Sijalu";
@@ -44,8 +45,18 @@ class Simulation {
     this.timeTillNextScore = Simulation.SCORE_DELAY;
   }
 
+  getRandomEnemy() {
+    const r = ~~(Math.random()*2);
+    switch (r) {
+      case 0: return new Maya();
+      case 1: return new Elias();
+    }
+    return new Maya();
+  }
+
   addEnemy() {
-    this.enemies.push(new Maya());
+    const enemy = this.getRandomEnemy();
+    this.enemies.push(enemy);
   }
 
   setTimeTillNextEnemy() {
@@ -93,6 +104,22 @@ class Simulation {
       this.setTimeTillNextScore();
       this.addToScore();
     }
+  }
+
+  handleJumpEvent() {
+    if (this.sijalu.getIsDead()) {
+      this.reset();
+      return;
+    }
+
+    if (!this.sijalu.getIsJumping()) {
+      this.sijalu.setIsMouseDown(true);
+    }
+    this.sijalu.jump();
+  }
+
+  handleStopJumpEvent() {
+    this.sijalu.setIsMouseDown(false);
   }
 };
 

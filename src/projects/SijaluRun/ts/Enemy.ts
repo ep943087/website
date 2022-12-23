@@ -1,7 +1,9 @@
+import CanvasImage from "../../../utils/CanvasImage";
 import HitBox from "../../../utils/HitBox";
 
 abstract class Enemy extends HitBox {
-  private static VELOCITY = 4;
+  private static VELOCITY = 3.5;
+  public abstract getImage(): CanvasImage;
 
   constructor() {
     super();
